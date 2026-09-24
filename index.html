@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Beshoy Zaref — Video Editor & Motion Designer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<nav>
+  <a href="#top" aria-label="Home"><img class="nav-logo" src="assets/icons/logo-nav.png" alt="INFINITY FRAME logo"></a>
+  <div class="navlinks">
+    <a href="#reels">Reels</a><a href="#ai">AI Work</a><a href="#about">About</a><a href="#contact">Contact</a>
+  </div>
+  <button class="burger" id="burgerBtn" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+<div class="mobilemenu" id="mobileMenu">
+  <a href="#reels">Reels</a><a href="#ai">AI Work</a><a href="#about">About</a><a href="#contact">Contact</a>
+</div>
+
+<section class="hero" id="top">
+  <canvas id="pixelCanvas" aria-hidden="true"></canvas>
+  <div class="hero-stack">
+    <h1 class="hero-name line1">beshoy</h1>
+    <div class="portrait-stage">
+      <img class="portrait-img" src="assets/images/portrait.jpg" alt="Beshoy Zaref portrait">
+      <div class="icon-badge ic1"><div class="icon-inner"><img src="assets/icons/premiere-pro.png" alt="Premiere Pro"></div></div>
+      <div class="icon-badge ic2"><div class="icon-inner"><img src="assets/icons/after-effects.png" alt="After Effects"></div></div>
+      <div class="icon-badge ic3"><div class="icon-inner"><img src="assets/icons/davinci-resolve.png" alt="DaVinci Resolve"></div></div>
+      <div class="icon-badge ic4"><div class="icon-inner"><img src="assets/icons/photoshop.png" alt="Photoshop"></div></div>
+      <div class="icon-badge ic5"><div class="icon-inner"><img src="assets/icons/illustrator.png" alt="Illustrator"></div></div>
+      <div class="icon-badge ic6"><div class="icon-inner"><img src="assets/icons/capcut.png" alt="CapCut"></div></div>
+    </div>
+    <h1 class="hero-name line2">zaref</h1>
+  </div>
+  <div class="sparkle">✦</div>
+  <p class="hero-line">I'm Beshoy — a Video Editor & Motion Designer creating engaging visual experiences through video editing and motion graphics.</p>
+  <div class="scrolldown"><div class="track"></div><span>SCROLL</span></div>
+</section>
+
+<section id="showreel">
+  <div class="wrap">
+    <div class="shead rv">
+      <div>
+        <div class="eyebrow"><span class="num">01</span> SHOWREEL</div>
+        <h2>Showreel</h2>
+      </div>
+    </div>
+    <div class="sr-video rv">
+      <button class="sr-play" aria-label="Play showreel">▶</button>
+      <span class="sr-label"><strong>No showreel uploaded yet</strong>Add a video source to make this player functional — 16:9</span>
+    </div>
+  </div>
+</section>
+
+<section id="reels">
+  <div class="wrap">
+    <div class="shead rv">
+      <div>
+        <div class="eyebrow"><span class="num">02</span> REELS</div>
+        <h2>Selected Reels</h2>
+      </div>
+      <p>A run of short-form edits — pacing, sound design, and story built for the scroll.</p>
+    </div>
+    <div class="carousel-row rv">
+      <button class="arrow" onclick="scrollCarousel(-1)">←</button>
+      <div class="carousel" id="reelTrack">
+        <!-- reel cards -->
+      </div>
+      <button class="arrow" onclick="scrollCarousel(1)">→</button>
+    </div>
+  </div>
+</section>
+
+<section id="ai" class="panel-cream">
+  <div class="wrap">
+    <div class="shead rv">
+      <div>
+        <div class="eyebrow"><span class="num">03</span> AI WORK</div>
+        <h2>AI-Powered Visuals</h2>
+      </div>
+      <p class="dim-text">Where prompt craft meets the timeline — generative footage, composited and graded.</p>
+    </div>
+    <div class="ai-row" id="aiRow"></div>
+  </div>
+</section>
+
+<section id="about" class="panel-slate">
+  <div class="wrap about-grid">
+    <div class="rv">
+      <div class="eyebrow"><span class="num">04</span> ABOUT</div>
+      <h2>Edit. Create.<br>Repeat.</h2>
+      <p class="bio">Four years cutting stories for brands, creators, and agencies — from fast-turnaround social reels to long-form narrative pieces. Focused on rhythm, clarity, and visuals that hold attention.</p>
+      <div class="services">
+        <div class="service-row"><span>Video Editing</span><span>Narrative & social</span></div>
+        <div class="service-row"><span>Motion Graphics</span><span>Titles & animation</span></div>
+        <div class="service-row"><span>Reels & Social Content</span><span>Short-form pacing</span></div>
+        <div class="service-row"><span>AI Video</span><span>Generative + compositing</span></div>
+        <div class="service-row"><span>Color Grading</span><span>Mood & consistency</span></div>
+      </div>
+    </div>
+    <div class="stats rv">
+      <div class="stat"><b>4</b><span>Years Experience</span></div>
+      <div class="stat"><b>120+</b><span>Projects</span></div>
+      <div class="stat"><b>30+</b><span>Clients</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="wrap contact-grid">
+    <div class="rv">
+      <div class="eyebrow"><span class="num">05</span> CONTACT</div>
+      <h2>Let's Create<br>Something.</h2>
+      <p class="form-note">This form isn't connected to email yet — reach out directly below, or use it once it's wired up.</p>
+      <form onsubmit="handleForm(event)">
+        <div class="field"><label>Name</label><input type="text" required></div>
+        <div class="field"><label>Email</label><input type="email" required></div>
+        <div class="field"><label>Project Details</label><textarea rows="4" required></textarea></div>
+        <button class="cta-btn" type="submit">Send Message</button>
+      </form>
+    </div>
+    <div class="contact-side rv">
+      <div>
+        <div class="email">beshoy12zaref@gmail.com</div>
+        <div class="socials">
+          <a href="#">Instagram</a><a href="#">Behance</a><a href="#">LinkedIn</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <img class="footer-logo" src="assets/icons/logo-footer.png" alt="INFINITY FRAME logo">
+  <span>© 2026 Beshoy Zaref — Video Editor & Motion Designer</span>
+</footer>
+
+<div class="modal-overlay" id="modalOverlay" role="dialog" aria-modal="true" aria-label="Reel preview">
+  <div class="modal-box">
+    <button class="modal-close" aria-label="Close preview">✕</button>
+    <p id="modalText"></p>
+  </div>
+</div>
+
+<script src="assets/script.js"></script>
+</body>
+</html>
