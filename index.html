@@ -8,12 +8,12 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script>document.documentElement.classList.add('js');</script>
-<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="./assets/css/style.css">
 </head>
 <body>
 
 <nav>
-  <a href="#top" aria-label="Home"><img class="nav-logo" src="assets/icons/logo-nav.png" alt="INFINITY FRAME logo"></a>
+  <a href="#top" aria-label="Home"><img class="nav-logo" src="./assets/icons/logo-nav.png" alt="INFINITY FRAME logo"></a>
   <div class="navlinks">
     <a href="#longform">Long Form</a><a href="#reels">Reels</a><a href="#ai-skills">AI Skills</a><a href="#about">About</a><a href="#contact">Contact</a>
   </div>
@@ -28,13 +28,13 @@
   <div class="hero-stack">
     <h1 class="hero-name line1">beshoy</h1>
     <div class="portrait-stage">
-      <img class="portrait-img" src="assets/images/portrait.jpg" alt="Beshoy Zaref portrait">
-      <div class="icon-badge ic1"><div class="icon-inner"><img src="assets/icons/premiere-pro.png" alt="Premiere Pro"></div></div>
-      <div class="icon-badge ic2"><div class="icon-inner"><img src="assets/icons/after-effects.png" alt="After Effects"></div></div>
-      <div class="icon-badge ic3"><div class="icon-inner"><img src="assets/icons/davinci-resolve.png" alt="DaVinci Resolve"></div></div>
-      <div class="icon-badge ic4"><div class="icon-inner"><img src="assets/icons/photoshop.png" alt="Photoshop"></div></div>
-      <div class="icon-badge ic5"><div class="icon-inner"><img src="assets/icons/illustrator.png" alt="Illustrator"></div></div>
-      <div class="icon-badge ic6"><div class="icon-inner"><img src="assets/icons/capcut.png" alt="CapCut"></div></div>
+      <img class="portrait-img" src="./assets/images/portrait.jpg" alt="Beshoy Zaref portrait">
+      <div class="icon-badge ic1"><div class="icon-inner"><img src="./assets/icons/premiere-pro.png" alt="Premiere Pro"></div></div>
+      <div class="icon-badge ic2"><div class="icon-inner"><img src="./assets/icons/after-effects.png" alt="After Effects"></div></div>
+      <div class="icon-badge ic3"><div class="icon-inner"><img src="./assets/icons/davinci-resolve.png" alt="DaVinci Resolve"></div></div>
+      <div class="icon-badge ic4"><div class="icon-inner"><img src="./assets/icons/photoshop.png" alt="Photoshop"></div></div>
+      <div class="icon-badge ic5"><div class="icon-inner"><img src="./assets/icons/illustrator.png" alt="Illustrator"></div></div>
+      <div class="icon-badge ic6"><div class="icon-inner"><img src="./assets/icons/capcut.png" alt="CapCut"></div></div>
     </div>
     <h1 class="hero-name line2">zaref</h1>
   </div>
@@ -52,8 +52,8 @@
       </div>
     </div>
     <div class="sr-video rv" id="showreelFrame" role="button" tabindex="0" aria-label="Play showreel video">
-      <button class="sr-play" aria-label="Play showreel">▶</button>
-      <span class="sr-label"><strong>No showreel uploaded yet</strong>Add a video source to make this player functional — 16:9</span>
+      <button class="sr-play" id="showreelPlay" aria-label="Play showreel" tabindex="-1">▶</button>
+      <span class="sr-label"><strong>Showreel</strong>Watch the full edit — 16:9</span>
     </div>
   </div>
 </section>
@@ -262,7 +262,7 @@
 </section>
 
 <footer>
-  <img class="footer-logo" src="assets/icons/logo-footer.png" alt="INFINITY FRAME logo">
+  <img class="footer-logo" src="./assets/icons/logo-footer.png" alt="INFINITY FRAME logo">
   <span>© 2026 Beshoy Zaref — Video Editor & Motion Designer</span>
 </footer>
 
@@ -275,6 +275,6 @@
   </div>
 </div>
 
-<script src="assets/script.js"></script>
+<script src="./assets/js/script.js"></script>
 </body>
 </html>
