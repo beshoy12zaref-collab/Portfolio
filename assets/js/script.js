@@ -1,38 +1,127 @@
-const reels = [
-  {cat:'Brand Story', title:'Arousa Tea'},
-  {cat:'Social Reel', title:'OpenClos'},
-  {cat:'Showreel', title:'2026 Reel'},
-  {cat:'Narrative', title:'Untitled Short'},
-  {cat:'Music Edit', title:'Visualizer'},
-  {cat:'Commercial', title:'Product Spot'}
+/* ================================================================
+   DEFAULT / FALLBACK CONTENT
+   This is what renders immediately, with no network calls, so the
+   site is never empty. If assets/js/portfolio-data.js later loads
+   live data from Supabase successfully, it calls the render*()
+   functions below again with that data — otherwise this fallback
+   content simply stays on screen.
+   ================================================================ */
+const DEFAULT_REELS = [
+  {title:'Arousa Tea',    cat:'Brand Story', src:'', poster:''},
+  {title:'OpenClos',      cat:'Social Reel', src:'', poster:''},
+  {title:'2026 Reel',     cat:'Showreel',    src:'', poster:''},
+  {title:'Untitled Short',cat:'Narrative',   src:'', poster:''},
+  {title:'Visualizer',    cat:'Music Edit',  src:'', poster:''},
+  {title:'Product Spot',  cat:'Commercial',  src:'', poster:''}
 ];
+
+/* EDIT YOUR LANDSCAPE (16:9) VIDEOS HERE (used only until Supabase data loads)
+   src:    video URL or file path (e.g. 'videos/project-1.mp4'). Leave '' → "Video coming soon".
+   poster: poster image URL/path (16:9 recommended, e.g. 1920×1080). Leave '' → branded placeholder. */
+const DEFAULT_LONG_FORM = [
+  {title:'Featured Long-Form Project', cat:'Documentary', src:'', poster:''},  // featured (large)
+  {title:'Long-Form Project 02',       cat:'Brand Film',  src:'', poster:''},
+  {title:'Long-Form Project 03',       cat:'YouTube',     src:'', poster:''}
+];
+const DEFAULT_AI_SKILLS = [
+  {title:'AI Video Generation',     desc:'Prompt-built footage shaped into a finished, story-driven edit.',        tags:['Generative','Prompt Design'], src:'', poster:''},
+  {title:'AI-Assisted Compositing', desc:'Generated elements matched and blended into live-action plates.',        tags:['Compositing','VFX'],          src:'', poster:''},
+  {title:'AI Product Visuals',      desc:'Product shots and environments created and animated with AI tools.',     tags:['Product','Motion'],           src:'', poster:''},
+  {title:'AI Visual Storytelling',  desc:'Generative scenes cut to rhythm and sound for a complete narrative.',     tags:['Storytelling','Editing'],     src:'', poster:''}
+];
+let DEFAULT_SHOWREEL_YT_ID = 'jtzYctPIu3E';
+let CONTACT_EMAIL = 'beshoy12zaref@gmail.com';
+
+const esc = v => String(v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* Recognizes youtube.com/watch, youtu.be, youtube.com/shorts and youtube.com/embed links
+   and returns the 11-character video id, or null if the string isn't a YouTube link. */
+function parseYouTubeId(url){
+  if(!url || typeof url !== 'string') return null;
+  try{
+    const u = new URL(url, location.href);
+    const host = u.hostname.replace(/^www\./,'').replace(/^m\./,'');
+    if(host === 'youtu.be'){
+      const id = u.pathname.split('/').filter(Boolean)[0];
+      return /^[\w-]{11}$/.test(id) ? id : null;
+    }
+    if(host === 'youtube.com' || host === 'youtube-nocookie.com'){
+      if(u.pathname === '/watch'){
+        const id = u.searchParams.get('v');
+        return id && /^[\w-]{11}$/.test(id) ? id : null;
+      }
+      const parts = u.pathname.split('/').filter(Boolean);
+      if((parts[0] === 'shorts' || parts[0] === 'embed') && parts[1]){
+        return /^[\w-]{11}$/.test(parts[1]) ? parts[1] : null;
+      }
+    }
+  }catch(e){ /* not a valid URL */ }
+  return null;
+}
+
+/* Declared here (before the render*() calls below) rather than further down, because
+   renderAiSkills() references it immediately when called for the default content at
+   load time — declaring it later with `const` would throw a temporal-dead-zone
+   ReferenceError and abort the rest of this script. */
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('in'); } });
+}, {threshold:.15});
+
 const track = document.getElementById('reelTrack');
-track.innerHTML = reels.map((r,i) => `
+function reelCardHTML(r, i){
+  const hasThumb = !!r.poster;
+  return `
   <div class="reel-item">
-    <div class="reel-card" tabindex="0" role="button" aria-label="Preview ${r.title}">
-      <div class="reel-fill">VIDEO<br>PLACEHOLDER</div>
+    <div class="reel-card" tabindex="0" role="button" data-i="${i}" aria-label="Preview ${esc(r.title)}">
+      ${hasThumb ? `<img src="${esc(r.poster)}" alt="" loading="lazy">` : `<div class="reel-fill">VIDEO<br>PLACEHOLDER</div>`}
       <div class="play">▶</div>
     </div>
     <div class="reel-meta">
       <span class="reel-num">${String(i+1).padStart(2,'0')}</span>
-      <span class="reel-title">${r.title}</span>
-      <span class="reel-cat">${r.cat}</span>
+      <span class="reel-title">${esc(r.title)}</span>
+      <span class="reel-cat">${esc(r.cat)}</span>
     </div>
-  </div>`).join('');
+  </div>`;
+}
+function bindReelCards(list){
+  track.querySelectorAll('.reel-card').forEach(card => {
+    const i = +card.dataset.i;
+    card.addEventListener('click', () => openModal(list[i].title, {src:list[i].src, poster:list[i].poster}));
+    card.addEventListener('keydown', e => { if(e.key==='Enter' || e.key===' '){ e.preventDefault(); openModal(list[i].title, {src:list[i].src, poster:list[i].poster}); } });
+  });
+}
+function renderReels(list){
+  track.innerHTML = list.map(reelCardHTML).join('');
+  bindReelCards(list);
+}
+renderReels(DEFAULT_REELS);
 function scrollCarousel(dir){ track.scrollBy({left: dir*260, behavior:'smooth'}); }
 
-// accessible preview modal — plays a real video when a src is supplied,
-// otherwise shows an intentional "coming soon" state
+// accessible preview modal — plays a real video (direct file or YouTube link) when a src
+// is supplied, otherwise shows an intentional "coming soon" state
 let lastFocused = null;
 const overlay = document.getElementById('modalOverlay');
 const modalBox = overlay.querySelector('.modal-box');
 const modalVideo = document.getElementById('modalVideo');
 const modalText = document.getElementById('modalText');
+const modalYT = document.getElementById('modalYT');
 function openModal(title, opts = {}){
   lastFocused = document.activeElement;
   modalBox.classList.toggle('landscape', !!opts.landscape);
-  modalBox.classList.toggle('has-video', !!opts.src);
-  if(opts.src){
+  const ytId = parseYouTubeId(opts.src);
+  modalBox.classList.toggle('has-yt', !!ytId);
+  modalBox.classList.toggle('has-video', !!opts.src && !ytId);
+  if(ytId){
+    modalText.textContent = '';
+    overlay.classList.add('yt-open');
+    const f = document.createElement('iframe');
+    f.src = 'https://www.youtube-nocookie.com/embed/' + ytId + '?autoplay=1&rel=0&modestbranding=1&playsinline=1';
+    f.title = title || 'Video';
+    f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+    f.allowFullscreen = true;
+    f.referrerPolicy = 'strict-origin-when-cross-origin';
+    modalYT.replaceChildren(f);
+  } else if(opts.src){
     modalVideo.src = opts.src;
     if(opts.poster) modalVideo.poster = opts.poster; else modalVideo.removeAttribute('poster');
     modalVideo.setAttribute('aria-label', title);
@@ -49,36 +138,14 @@ function openModal(title, opts = {}){
 function closeModal(){
   overlay.classList.remove('open');
   modalVideo.pause(); modalVideo.removeAttribute('src'); modalVideo.load();
-  modalBox.classList.remove('has-yt'); overlay.classList.remove('yt-open'); document.getElementById('modalYT').innerHTML = '';
+  modalBox.classList.remove('has-yt'); overlay.classList.remove('yt-open'); modalYT.innerHTML = '';
   modalBox.classList.remove('has-video');
   if(lastFocused) lastFocused.focus();
 }
-track.querySelectorAll('.reel-card').forEach((card,i) => {
-  card.addEventListener('click', () => openModal(reels[i].title));
-  card.addEventListener('keydown', e => { if(e.key==='Enter' || e.key===' '){ e.preventDefault(); openModal(reels[i].title); } });
-});
 overlay.addEventListener('click', e => { if(e.target === overlay) closeModal(); });
 overlay.querySelector('.modal-close').addEventListener('click', closeModal);
 document.addEventListener('keydown', e => { if(e.key==='Escape' && overlay.classList.contains('open')) closeModal(); });
 
-/* ================================================================
-   EDIT YOUR LANDSCAPE (16:9) VIDEOS HERE
-   src:    video URL or file path (e.g. 'videos/project-1.mp4'). Leave '' → "Video coming soon".
-   poster: poster image URL/path (16:9 recommended, e.g. 1920×1080). Leave '' → branded placeholder.
-   ================================================================ */
-const LONG_FORM = [
-  {title:'Featured Long-Form Project', cat:'Documentary', src:'', poster:''},  // featured (large)
-  {title:'Long-Form Project 02',       cat:'Brand Film',  src:'', poster:''},
-  {title:'Long-Form Project 03',       cat:'YouTube',     src:'', poster:''}
-];
-const AI_SKILLS = [
-  {title:'AI Video Generation',     desc:'Prompt-built footage shaped into a finished, story-driven edit.',        tags:['Generative','Prompt Design'], src:'', poster:''},
-  {title:'AI-Assisted Compositing', desc:'Generated elements matched and blended into live-action plates.',        tags:['Compositing','VFX'],          src:'', poster:''},
-  {title:'AI Product Visuals',      desc:'Product shots and environments created and animated with AI tools.',     tags:['Product','Motion'],           src:'', poster:''},
-  {title:'AI Visual Storytelling',  desc:'Generative scenes cut to rhythm and sound for a complete narrative.',     tags:['Storytelling','Editing'],     src:'', poster:''}
-];
-
-const esc = v => String(v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function posterHTML(v, i){
   const empty = !v.src;
   return `<button type="button" class="vposter${empty?' is-empty':''}" data-i="${i}" aria-label="${empty?'Video coming soon: ':'Play '}${esc(v.title)}">
@@ -94,8 +161,10 @@ function bindPosters(root, list){
     openModal(v.title, {landscape:true, src:v.src, poster:v.poster});
   }));
 }
+
 const lfGrid = document.getElementById('longFormGrid');
-lfGrid.innerHTML = LONG_FORM.map((v,i) => `
+function renderLongForm(list){
+  lfGrid.innerHTML = list.map((v,i) => `
   <div class="vcard${i===0?' featured':''}">
     ${posterHTML(v,i)}
     <div class="vmeta">
@@ -104,10 +173,13 @@ lfGrid.innerHTML = LONG_FORM.map((v,i) => `
       <span class="reel-cat">${esc(v.cat)}</span>
     </div>
   </div>`).join('');
-bindPosters(lfGrid, LONG_FORM);
+  bindPosters(lfGrid, list);
+}
+renderLongForm(DEFAULT_LONG_FORM);
 
 const aiGrid = document.getElementById('aiSkillsGrid');
-aiGrid.innerHTML = AI_SKILLS.map((v,i) => `
+function renderAiSkills(list){
+  aiGrid.innerHTML = list.map((v,i) => `
   <article class="ai-card rv">
     ${posterHTML(v,i)}
     <div class="ai-body">
@@ -117,7 +189,10 @@ aiGrid.innerHTML = AI_SKILLS.map((v,i) => `
       ${v.tags && v.tags.length ? `<div class="tags">${v.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>` : ''}
     </div>
   </article>`).join('');
-bindPosters(aiGrid, AI_SKILLS);
+  bindPosters(aiGrid, list);
+  document.querySelectorAll('#aiSkillsGrid .ai-card').forEach(el => io && io.observe(el));
+}
+renderAiSkills(DEFAULT_AI_SKILLS);
 
 const burgerBtn = document.getElementById('burgerBtn');
 const mobileMenu = document.getElementById('mobileMenu');
@@ -129,9 +204,6 @@ mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => 
   burgerBtn.classList.remove('open'); mobileMenu.classList.remove('open');
 }));
 
-const io = new IntersectionObserver(entries => {
-  entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('in'); } });
-}, {threshold:.15});
 document.querySelectorAll('.rv').forEach(el => io.observe(el));
 
 async function handleForm(e){
@@ -143,7 +215,7 @@ async function handleForm(e){
   status.className = 'form-status'; status.textContent = '';
   btn.disabled = true; btn.textContent = 'Sending…';
   try{
-    const res = await fetch('https://formsubmit.co/ajax/beshoy12zaref@gmail.com', {
+    const res = await fetch('https://formsubmit.co/ajax/' + CONTACT_EMAIL, {
       method:'POST',
       headers:{'Content-Type':'application/json','Accept':'application/json'},
       body: JSON.stringify({
@@ -163,10 +235,21 @@ async function handleForm(e){
     status.textContent = 'Thanks — your message has been sent. I’ll get back to you soon.';
   }catch(err){
     status.classList.add('err');
-    status.innerHTML = 'Sorry, something went wrong. Please try again or email me at <a href="mailto:beshoy12zaref@gmail.com">beshoy12zaref@gmail.com</a>.';
+    status.innerHTML = `Sorry, something went wrong. Please try again or email me at <a href="mailto:${esc(CONTACT_EMAIL)}">${esc(CONTACT_EMAIL)}</a>.`;
   }finally{
     btn.disabled = false; btn.textContent = 'Send Message';
   }
+}
+
+/* Lets portfolio-data.js apply a Site Content override for the contact email without
+   touching any other approved markup. */
+function setContactEmail(email){
+  if(!email || typeof email !== 'string') return;
+  CONTACT_EMAIL = email;
+  const el = document.querySelector('.contact-side .email');
+  if(el) el.textContent = email;
+  const form = document.getElementById('contactForm');
+  if(form) form.action = 'https://formsubmit.co/' + email;
 }
 
 (function(){
@@ -224,27 +307,18 @@ async function handleForm(e){
   window.addEventListener('resize', ()=>{ build(); if(!running) draw(); });
 })();
 
-// Showreel: the approved custom frame opens the YouTube video in the shared lightbox on click
-const SHOWREEL_YT_ID = 'jtzYctPIu3E';
+// Showreel: the approved custom frame opens a video in the shared lightbox on click.
+// Defaults to the YouTube video below; portfolio-data.js can call setShowreelVideo()
+// to point it at a different link from Supabase without touching the frame itself.
+let SHOWREEL_SRC = 'https://youtu.be/' + DEFAULT_SHOWREEL_YT_ID;
 (function(){
   const frame = document.getElementById('showreelFrame');
   if(!frame) return;
-  function openShowreel(){
-    lastFocused = document.activeElement;
-    modalText.textContent = '';
-    modalBox.classList.add('landscape', 'has-yt');
-    modalBox.classList.remove('has-video');
-    overlay.classList.add('yt-open');
-    const f = document.createElement('iframe');
-    f.src = 'https://www.youtube-nocookie.com/embed/' + SHOWREEL_YT_ID + '?autoplay=1&rel=0&modestbranding=1&playsinline=1';
-    f.title = 'Showreel';
-    f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
-    f.allowFullscreen = true;
-    f.referrerPolicy = 'strict-origin-when-cross-origin';
-    document.getElementById('modalYT').replaceChildren(f);
-    overlay.classList.add('open');
-    overlay.querySelector('.modal-close').focus();
-  }
+  function openShowreel(){ openModal('Showreel', {landscape:true, src:SHOWREEL_SRC}); }
   frame.addEventListener('click', openShowreel);
   frame.addEventListener('keydown', e => { if(e.key==='Enter' || e.key===' '){ e.preventDefault(); openShowreel(); } });
 })();
+function setShowreelVideo(url){
+  if(!url || typeof url !== 'string') return;
+  SHOWREEL_SRC = url;
+}

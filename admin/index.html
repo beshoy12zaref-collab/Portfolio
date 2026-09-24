@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Admin — Beshoy Zaref Portfolio</title>
+<meta name="robots" content="noindex, nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./admin.css">
+</head>
+<body>
+
+<!-- Login view is the default, visible-in-HTML state — the dashboard below is
+     hidden with the `hidden` attribute in markup (not just via JS after load),
+     so there is no flash of dashboard content before the session check runs. -->
+<main id="loginView" class="login-view">
+  <form id="loginForm" class="login-card" autocomplete="off">
+    <h1>Admin Login</h1>
+    <p class="login-sub">Beshoy Zaref Portfolio — restricted access</p>
+    <div class="field">
+      <label for="li-email">Email</label>
+      <input id="li-email" name="email" type="email" autocomplete="username" required>
+    </div>
+    <div class="field">
+      <label for="li-password">Password</label>
+      <input id="li-password" name="password" type="password" autocomplete="current-password" required>
+    </div>
+    <button type="submit" class="btn primary" id="loginBtn">Sign In</button>
+    <p class="login-error" id="loginError" role="alert" aria-live="polite"></p>
+  </form>
+</main>
+
+<div id="appView" class="app-view" hidden>
+  <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">☰</button>
+  <nav class="sidebar" id="sidebar">
+    <div class="brand">Admin</div>
+    <button class="navitem active" data-view="dashboard">Dashboard</button>
+    <button class="navitem" data-view="projects">Projects</button>
+    <button class="navitem" data-view="content">Site Content</button>
+    <button class="navitem" data-view="media">Media</button>
+    <button class="navitem" data-view="analytics">Analytics</button>
+    <button class="navitem logout" id="logoutBtn">Logout</button>
+  </nav>
+
+  <div class="content-area">
+
+    <section id="view-dashboard" class="view active">
+      <h2>Dashboard</h2>
+      <div class="stat-row" id="dashStats">
+        <div class="stat-card"><span class="stat-num" id="statProjects">—</span><span class="stat-label">Projects</span></div>
+        <div class="stat-card"><span class="stat-num" id="statVisible">—</span><span class="stat-label">Visible</span></div>
+        <div class="stat-card"><span class="stat-num" id="statViews">—</span><span class="stat-label">Total Views</span></div>
+        <div class="stat-card"><span class="stat-num" id="statVisitors">—</span><span class="stat-label">Unique Visitors</span></div>
+      </div>
+      <div id="importBanner" class="import-banner" hidden>
+        <p>No projects found in your database yet. Import the portfolio's current default content to get started.</p>
+        <button class="btn primary" id="importBtn">Import Current Portfolio</button>
+      </div>
+      <p class="hint">Use the sidebar to manage Projects, Site Content, Media and Analytics.</p>
+    </section>
+
+    <section id="view-projects" class="view">
+      <h2>Projects</h2>
+      <div class="toolbar">
+        <input type="search" id="projSearch" placeholder="Search by title or category…">
+        <select id="projSectionFilter">
+          <option value="">All sections</option>
+          <option value="showreel">Showreel</option>
+          <option value="long_form">Long Form</option>
+          <option value="reels">Reels</option>
+          <option value="ai_skills">AI Skills</option>
+        </select>
+        <button class="btn primary" id="addProjectBtn">+ Add Project</button>
+      </div>
+      <div id="projectsList" class="projects-list"></div>
+    </section>
+
+    <section id="view-content" class="view">
+      <h2>Site Content</h2>
+      <p class="hint">Fields save to the <code>site_content</code> table. Leave a field blank to keep the site's built-in default text for it.</p>
+      <form id="contentForm" class="content-form">
+        <div class="field"><label for="sc-hero_intro">Hero intro line</label><textarea id="sc-hero_intro" data-key="hero_intro" rows="2"></textarea></div>
+        <div class="field"><label for="sc-about_heading">About heading</label><input id="sc-about_heading" data-key="about_heading" type="text"></div>
+        <div class="field"><label for="sc-about_paragraph">About paragraph</label><textarea id="sc-about_paragraph" data-key="about_paragraph" rows="4"></textarea></div>
+        <div class="field"><label for="sc-contact_heading">Contact heading</label><input id="sc-contact_heading" data-key="contact_heading" type="text"></div>
+        <div class="field"><label for="sc-contact_paragraph">Contact paragraph</label><textarea id="sc-contact_paragraph" data-key="contact_paragraph" rows="2"></textarea></div>
+        <div class="field"><label for="sc-email">Contact email</label><input id="sc-email" data-key="email" type="email"></div>
+        <div class="field"><label for="sc-instagram_url">Instagram URL</label><input id="sc-instagram_url" data-key="instagram_url" type="url"></div>
+        <div class="field"><label for="sc-showreel_heading">Showreel heading</label><input id="sc-showreel_heading" data-key="showreel_heading" type="text"></div>
+        <div class="field"><label for="sc-longform_heading">Long Form heading</label><input id="sc-longform_heading" data-key="longform_heading" type="text"></div>
+        <div class="field"><label for="sc-longform_description">Long Form description</label><textarea id="sc-longform_description" data-key="longform_description" rows="2"></textarea></div>
+        <div class="field"><label for="sc-reels_heading">Reels heading</label><input id="sc-reels_heading" data-key="reels_heading" type="text"></div>
+        <div class="field"><label for="sc-reels_description">Reels description</label><textarea id="sc-reels_description" data-key="reels_description" rows="2"></textarea></div>
+        <div class="field"><label for="sc-aiskills_heading">AI Skills heading</label><input id="sc-aiskills_heading" data-key="aiskills_heading" type="text"></div>
+        <div class="field"><label for="sc-aiskills_description">AI Skills description</label><textarea id="sc-aiskills_description" data-key="aiskills_description" rows="2"></textarea></div>
+        <button type="submit" class="btn primary">Save Site Content</button>
+        <p class="save-status" id="contentStatus" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <section id="view-media" class="view">
+      <h2>Media</h2>
+      <p class="hint">Files in the <code>portfolio-media</code> storage bucket.</p>
+      <button class="btn" id="refreshMediaBtn">Refresh</button>
+      <div id="mediaGrid" class="media-grid"></div>
+    </section>
+
+    <section id="view-analytics" class="view">
+      <h2>Analytics</h2>
+      <button class="btn" id="refreshAnalyticsBtn">Refresh</button>
+      <div class="stat-row" id="analyticsStats">
+        <div class="stat-card"><span class="stat-num" id="aTotal">—</span><span class="stat-label">Total Views</span></div>
+        <div class="stat-card"><span class="stat-num" id="aUnique">—</span><span class="stat-label">Unique Visitors</span></div>
+        <div class="stat-card"><span class="stat-num" id="aToday">—</span><span class="stat-label">Today</span></div>
+        <div class="stat-card"><span class="stat-num" id="a7">—</span><span class="stat-label">Last 7 Days</span></div>
+        <div class="stat-card"><span class="stat-num" id="a30">—</span><span class="stat-label">Last 30 Days</span></div>
+        <div class="stat-card"><span class="stat-num" id="aMobile">—</span><span class="stat-label">Mobile / Desktop</span></div>
+      </div>
+      <h3>Visits — last 14 days</h3>
+      <canvas id="visitsChart" width="800" height="220" class="chart-canvas"></canvas>
+      <h3>Top Referrers</h3>
+      <div id="referrersList" class="referrers-list"></div>
+    </section>
+
+  </div>
+</div>
+
+<!-- Project add/edit form modal -->
+<div class="modal-overlay" id="projectModal">
+  <div class="modal-card">
+    <button class="modal-x" id="projectModalClose" aria-label="Close">✕</button>
+    <h3 id="projectModalTitle">Add Project</h3>
+    <form id="projectForm">
+      <input type="hidden" id="pf-id">
+      <div class="field"><label for="pf-title">Title</label><input id="pf-title" type="text" required></div>
+      <div class="field"><label for="pf-section">Section</label>
+        <select id="pf-section" required>
+          <option value="showreel">Showreel</option>
+          <option value="long_form">Long Form</option>
+          <option value="reels">Reels</option>
+          <option value="ai_skills">AI Skills</option>
+        </select>
+      </div>
+      <div class="field"><label for="pf-category">Category</label><input id="pf-category" type="text"></div>
+      <div class="field"><label for="pf-description">Description</label><textarea id="pf-description" rows="2"></textarea></div>
+      <div class="field"><label for="pf-video">Video URL (YouTube or direct file link)</label><input id="pf-video" type="url"><span class="field-note" id="pf-video-note"></span></div>
+      <div class="field"><label for="pf-thumb-file">Thumbnail</label>
+        <input id="pf-thumb-file" type="file" accept="image/jpeg,image/png,image/webp,image/gif">
+        <div class="thumb-preview-wrap"><img id="pf-thumb-preview" class="thumb-preview" alt=""><div class="upload-progress" id="pf-upload-progress" hidden><div class="upload-progress-bar" id="pf-upload-bar"></div></div></div>
+        <input type="hidden" id="pf-thumb-url">
+      </div>
+      <div class="field"><label for="pf-order">Display order</label><input id="pf-order" type="number" step="1" value="0"></div>
+      <div class="field checkbox-field"><label><input id="pf-visible" type="checkbox" checked> Visible on site</label></div>
+      <div class="modal-actions">
+        <button type="button" class="btn" id="projectFormCancel">Cancel</button>
+        <button type="submit" class="btn primary" id="projectFormSave">Save</button>
+      </div>
+      <p class="save-status" id="projectFormStatus" role="status" aria-live="polite"></p>
+    </form>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="../assets/js/supabase-config.js"></script>
+<script src="./admin.js"></script>
+</body>
+</html>
