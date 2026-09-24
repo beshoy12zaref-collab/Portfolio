@@ -91,9 +91,6 @@ nav{position:fixed; top:0; left:0; right:0; z-index:50; padding:16px 24px; displ
 .sr-label{position:absolute; bottom:22px; left:24px; color:var(--dim); font-size:12px; letter-spacing:.05em; text-align:left;}
 .sr-label strong{display:block; color:var(--fg); font-size:13px; font-weight:600; margin-bottom:2px;}
 @media (max-width:640px){ #showreel{padding-top:34px;} .sr-label{left:16px; bottom:16px;} }
-.sr-media{position:absolute; inset:0; width:100%; height:100%; display:block; object-fit:cover; background:var(--bg2);}
-.sr-play{z-index:2; transition:opacity .3s ease;}
-.sr-video.playing .sr-play{opacity:0; pointer-events:none; animation:none;}
 
 /* reveal */
 .js .rv{opacity:0; transform:translateY(28px); transition:opacity .7s ease, transform .7s ease;}
@@ -143,6 +140,15 @@ nav{position:fixed; top:0; left:0; right:0; z-index:50; padding:16px 24px; displ
 .modal-soon{display:block; font-family:'Bebas Neue'; font-size:clamp(28px,5vw,48px); color:var(--accent); letter-spacing:.03em; margin-bottom:8px;}
 @media (max-width:640px){ .modal-overlay{padding:16px;} .modal-box.landscape{padding:18px 44px;} }
 .modal-close{position:absolute; top:12px; right:12px; width:36px; height:36px; border-radius:50%; border:1px solid var(--line); background:transparent; color:var(--fg); font-size:16px; cursor:pointer;}
+/* showreel → YouTube lightbox (frame itself is unchanged) */
+#showreelFrame{cursor:pointer;}
+.modal-yt{display:none; width:100%; height:100%; border-radius:10px; overflow:hidden;}
+.modal-yt iframe{display:block; width:100%; height:100%; border:0;}
+.modal-box.has-yt{padding:0; overflow:visible; background:#000; max-width:min(960px, calc((100vh - 112px) * 16 / 9)); max-width:min(960px, calc((100dvh - 112px) * 16 / 9));}
+.modal-box.has-yt .modal-yt{display:block;}
+.modal-box.has-yt #modalText{display:none;}
+.modal-box.has-yt .modal-close{z-index:2; top:-46px; right:0; background:rgba(20,20,20,.6);}
+.modal-overlay.yt-open{padding-top:64px;}
 
 /* VIDEO CARDS (shared: Long Form + AI Skills) */
 .vcard{min-width:0;}

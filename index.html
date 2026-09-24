@@ -51,9 +51,9 @@
         <h2>Showreel</h2>
       </div>
     </div>
-    <div class="sr-video rv">
-      <video class="sr-media" id="showreelVideo" src="assets/videos/showreel.mp4" poster="assets/images/showreel-poster.jpg" controls playsinline preload="metadata" aria-label="Showreel"></video>
-      <button class="sr-play" id="showreelPlay" aria-label="Play showreel">▶</button>
+    <div class="sr-video rv" id="showreelFrame" role="button" tabindex="0" aria-label="Play showreel video">
+      <button class="sr-play" aria-label="Play showreel">▶</button>
+      <span class="sr-label"><strong>No showreel uploaded yet</strong>Add a video source to make this player functional — 16:9</span>
     </div>
   </div>
 </section>
@@ -270,6 +270,7 @@
   <div class="modal-box">
     <button class="modal-close" aria-label="Close preview">✕</button>
     <video class="modal-video" id="modalVideo" controls playsinline preload="metadata"></video>
+    <div class="modal-yt" id="modalYT"></div>
     <p id="modalText"></p>
   </div>
 </div>

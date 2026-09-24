@@ -49,6 +49,7 @@ function openModal(title, opts = {}){
 function closeModal(){
   overlay.classList.remove('open');
   modalVideo.pause(); modalVideo.removeAttribute('src'); modalVideo.load();
+  modalBox.classList.remove('has-yt'); overlay.classList.remove('yt-open'); document.getElementById('modalYT').innerHTML = '';
   modalBox.classList.remove('has-video');
   if(lastFocused) lastFocused.focus();
 }
@@ -223,14 +224,27 @@ async function handleForm(e){
   window.addEventListener('resize', ()=>{ build(); if(!running) draw(); });
 })();
 
-// showreel: orange play overlay starts the native player; hides while playing
+// Showreel: the whole original frame opens the YouTube video in the lightbox
+const SHOWREEL_YT_ID = 'jtzYctPIu3E';
 (function(){
-  const v = document.getElementById('showreelVideo');
-  const btn = document.getElementById('showreelPlay');
-  if(!v || !btn) return;
-  const frame = v.closest('.sr-video');
-  btn.addEventListener('click', () => { const p = v.play(); if(p && p.catch) p.catch(()=>{}); });
-  v.addEventListener('play', () => frame.classList.add('playing'));
-  v.addEventListener('pause', () => { if(!v.seeking) frame.classList.remove('playing'); });
-  v.addEventListener('ended', () => frame.classList.remove('playing'));
+  const frame = document.getElementById('showreelFrame');
+  if(!frame) return;
+  function openShowreel(){
+    lastFocused = document.activeElement;
+    modalText.textContent = '';
+    modalBox.classList.add('landscape', 'has-yt');
+    modalBox.classList.remove('has-video');
+    overlay.classList.add('yt-open');
+    const f = document.createElement('iframe');
+    f.src = 'https://www.youtube-nocookie.com/embed/' + SHOWREEL_YT_ID + '?autoplay=1&rel=0&modestbranding=1&playsinline=1';
+    f.title = 'Showreel';
+    f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+    f.allowFullscreen = true;
+    f.referrerPolicy = 'strict-origin-when-cross-origin';
+    document.getElementById('modalYT').replaceChildren(f);
+    overlay.classList.add('open');
+    overlay.querySelector('.modal-close').focus();
+  }
+  frame.addEventListener('click', openShowreel);
+  frame.addEventListener('keydown', e => { if(e.key==='Enter' || e.key===' '){ e.preventDefault(); openShowreel(); } });
 })();
