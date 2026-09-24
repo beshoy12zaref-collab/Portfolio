@@ -11,7 +11,8 @@ Sections: Hero · Showreel · Long Form · Reels · AI Skills · About · Contac
 portfolio/
 ├── index.html          ← the page (GitHub Pages opens this first)
 ├── assets/
-│   ├── images/         ← portrait photo
+│   ├── images/         ← portrait photo + showreel poster
+│   ├── videos/         ← showreel.mp4
 │   ├── icons/          ← software icons + INFINITY FRAME logos
 │   ├── style.css       ← all styles, animations and responsive rules
 │   └── script.js       ← Long Form, Reels, AI Skills cards, video modal, menu, contact form, hero canvas
@@ -38,7 +39,11 @@ Every path is relative, for example `assets/images/portrait.jpg`. The site works
 
 ## Adding your videos
 
-1. Create a folder `assets/videos/` in the repository and upload your `.mp4` files there. Upload poster images to `assets/images/`.
+The Showreel plays `assets/videos/showreel.mp4`, with `assets/images/showreel-poster.jpg` shown before playback.
+To swap it, upload a new file with the same name. Use an H.264 MP4, because HEVC/H.265 won't play in every browser.
+
+
+1. Upload your `.mp4` files there. Upload poster images to `assets/images/`.
 2. In `assets/script.js`, fill in `src` and `poster` in the `LONG_FORM` and `AI_SKILLS` lists, for example:
    `{title:'Brand Film', cat:'Brand Film', src:'assets/videos/brand-film.mp4', poster:'assets/images/brand-film.jpg'}`
    An item with an empty `src` shows "Video coming soon".

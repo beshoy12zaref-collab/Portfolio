@@ -222,3 +222,15 @@ async function handleForm(e){
   }
   window.addEventListener('resize', ()=>{ build(); if(!running) draw(); });
 })();
+
+// showreel: orange play overlay starts the native player; hides while playing
+(function(){
+  const v = document.getElementById('showreelVideo');
+  const btn = document.getElementById('showreelPlay');
+  if(!v || !btn) return;
+  const frame = v.closest('.sr-video');
+  btn.addEventListener('click', () => { const p = v.play(); if(p && p.catch) p.catch(()=>{}); });
+  v.addEventListener('play', () => frame.classList.add('playing'));
+  v.addEventListener('pause', () => { if(!v.seeking) frame.classList.remove('playing'); });
+  v.addEventListener('ended', () => frame.classList.remove('playing'));
+})();
