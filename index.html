@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>document.documentElement.classList.add('js');</script>
 <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
@@ -14,12 +15,12 @@
 <nav>
   <a href="#top" aria-label="Home"><img class="nav-logo" src="assets/icons/logo-nav.png" alt="INFINITY FRAME logo"></a>
   <div class="navlinks">
-    <a href="#reels">Reels</a><a href="#ai">AI Work</a><a href="#about">About</a><a href="#contact">Contact</a>
+    <a href="#longform">Long Form</a><a href="#reels">Reels</a><a href="#ai-skills">AI Skills</a><a href="#about">About</a><a href="#contact">Contact</a>
   </div>
   <button class="burger" id="burgerBtn" aria-label="Menu"><span></span><span></span><span></span></button>
 </nav>
 <div class="mobilemenu" id="mobileMenu">
-  <a href="#reels">Reels</a><a href="#ai">AI Work</a><a href="#about">About</a><a href="#contact">Contact</a>
+  <a href="#longform">Long Form</a><a href="#reels">Reels</a><a href="#ai-skills">AI Skills</a><a href="#about">About</a><a href="#contact">Contact</a>
 </div>
 
 <section class="hero" id="top">
@@ -57,11 +58,65 @@
   </div>
 </section>
 
+<section id="longform">
+  <div class="wrap">
+    <div class="shead rv">
+      <div>
+        <div class="eyebrow"><span class="num">02</span> LONG FORM</div>
+        <h2>Long Form</h2>
+      </div>
+      <p>Landscape edits with room to breathe — story, structure, and pacing across the full runtime.</p>
+    </div>
+    <!-- Cards are generated from the LONG_FORM list in the script at the bottom of this file -->
+    <div class="lf-grid rv" id="longFormGrid">
+  <div class="vcard featured">
+    <button type="button" class="vposter is-empty" data-i="0" aria-label="Video coming soon: Featured Long-Form Project">
+      <span class="vmark" aria-hidden="true">01</span>
+      <span class="vplay" aria-hidden="true">▶</span>
+      <span class="vsoon">Video coming soon</span>
+      <span class="vratio" aria-hidden="true">16:9</span>
+    </button>
+    <div class="vmeta">
+      <span class="reel-num">01</span>
+      <span class="reel-title">Featured Long-Form Project</span>
+      <span class="reel-cat">Documentary</span>
+    </div>
+  </div>
+  <div class="vcard">
+    <button type="button" class="vposter is-empty" data-i="1" aria-label="Video coming soon: Long-Form Project 02">
+      <span class="vmark" aria-hidden="true">02</span>
+      <span class="vplay" aria-hidden="true">▶</span>
+      <span class="vsoon">Video coming soon</span>
+      <span class="vratio" aria-hidden="true">16:9</span>
+    </button>
+    <div class="vmeta">
+      <span class="reel-num">02</span>
+      <span class="reel-title">Long-Form Project 02</span>
+      <span class="reel-cat">Brand Film</span>
+    </div>
+  </div>
+  <div class="vcard">
+    <button type="button" class="vposter is-empty" data-i="2" aria-label="Video coming soon: Long-Form Project 03">
+      <span class="vmark" aria-hidden="true">03</span>
+      <span class="vplay" aria-hidden="true">▶</span>
+      <span class="vsoon">Video coming soon</span>
+      <span class="vratio" aria-hidden="true">16:9</span>
+    </button>
+    <div class="vmeta">
+      <span class="reel-num">03</span>
+      <span class="reel-title">Long-Form Project 03</span>
+      <span class="reel-cat">YouTube</span>
+    </div>
+  </div>
+    </div>
+  </div>
+</section>
+
 <section id="reels">
   <div class="wrap">
     <div class="shead rv">
       <div>
-        <div class="eyebrow"><span class="num">02</span> REELS</div>
+        <div class="eyebrow"><span class="num">03</span> REELS</div>
         <h2>Selected Reels</h2>
       </div>
       <p>A run of short-form edits — pacing, sound design, and story built for the scroll.</p>
@@ -69,32 +124,98 @@
     <div class="carousel-row rv">
       <button class="arrow" onclick="scrollCarousel(-1)">←</button>
       <div class="carousel" id="reelTrack">
-        <!-- reel cards -->
+  <div class="reel-item">
+    <div class="reel-card" tabindex="0" role="button" aria-label="Preview Arousa Tea">
+      <div class="reel-fill">VIDEO<br>PLACEHOLDER</div>
+      <div class="play">▶</div>
+    </div>
+    <div class="reel-meta">
+      <span class="reel-num">01</span>
+      <span class="reel-title">Arousa Tea</span>
+      <span class="reel-cat">Brand Story</span>
+    </div>
+  </div>
+  <div class="reel-item">
+    <div class="reel-card" tabindex="0" role="button" aria-label="Preview OpenClos">
+      <div class="reel-fill">VIDEO<br>PLACEHOLDER</div>
+      <div class="play">▶</div>
+    </div>
+    <div class="reel-meta">
+      <span class="reel-num">02</span>
+      <span class="reel-title">OpenClos</span>
+      <span class="reel-cat">Social Reel</span>
+    </div>
+  </div>
+  <div class="reel-item">
+    <div class="reel-card" tabindex="0" role="button" aria-label="Preview 2026 Reel">
+      <div class="reel-fill">VIDEO<br>PLACEHOLDER</div>
+      <div class="play">▶</div>
+    </div>
+    <div class="reel-meta">
+      <span class="reel-num">03</span>
+      <span class="reel-title">2026 Reel</span>
+      <span class="reel-cat">Showreel</span>
+    </div>
+  </div>
+  <div class="reel-item">
+    <div class="reel-card" tabindex="0" role="button" aria-label="Preview Untitled Short">
+      <div class="reel-fill">VIDEO<br>PLACEHOLDER</div>
+      <div class="play">▶</div>
+    </div>
+    <div class="reel-meta">
+      <span class="reel-num">04</span>
+      <span class="reel-title">Untitled Short</span>
+      <span class="reel-cat">Narrative</span>
+    </div>
+  </div>
+  <div class="reel-item">
+    <div class="reel-card" tabindex="0" role="button" aria-label="Preview Visualizer">
+      <div class="reel-fill">VIDEO<br>PLACEHOLDER</div>
+      <div class="play">▶</div>
+    </div>
+    <div class="reel-meta">
+      <span class="reel-num">05</span>
+      <span class="reel-title">Visualizer</span>
+      <span class="reel-cat">Music Edit</span>
+    </div>
+  </div>
+  <div class="reel-item">
+    <div class="reel-card" tabindex="0" role="button" aria-label="Preview Product Spot">
+      <div class="reel-fill">VIDEO<br>PLACEHOLDER</div>
+      <div class="play">▶</div>
+    </div>
+    <div class="reel-meta">
+      <span class="reel-num">06</span>
+      <span class="reel-title">Product Spot</span>
+      <span class="reel-cat">Commercial</span>
+    </div>
+  </div>
       </div>
       <button class="arrow" onclick="scrollCarousel(1)">→</button>
     </div>
   </div>
 </section>
 
-<section id="ai" class="panel-cream">
+<section id="ai-skills" class="panel-cream">
   <div class="wrap">
     <div class="shead rv">
       <div>
-        <div class="eyebrow"><span class="num">03</span> AI WORK</div>
-        <h2>AI-Powered Visuals</h2>
+        <div class="eyebrow"><span class="num">04</span> AI SKILLS</div>
+        <h2>AI Skills</h2>
       </div>
-      <p class="dim-text">Where prompt craft meets the timeline — generative footage, composited and graded.</p>
+      <p class="dim-text">Skills shown through the work — generative footage, compositing, and AI-built visuals cut to story.</p>
     </div>
-    <div class="ai-row" id="aiRow"></div>
+    <!-- Cards are generated from the AI_SKILLS list in the script at the bottom of this file -->
+    <div class="ai-grid" id="aiSkillsGrid"></div>
   </div>
 </section>
 
 <section id="about" class="panel-slate">
   <div class="wrap about-grid">
     <div class="rv">
-      <div class="eyebrow"><span class="num">04</span> ABOUT</div>
-      <h2>Edit. Create.<br>Repeat.</h2>
-      <p class="bio">Four years cutting stories for brands, creators, and agencies — from fast-turnaround social reels to long-form narrative pieces. Focused on rhythm, clarity, and visuals that hold attention.</p>
+      <div class="eyebrow"><span class="num">05</span> ABOUT</div>
+      <h2>Crafting Stories<br>That Move.</h2>
+      <p class="bio">For the past four years, I’ve worked with brands, creators, and agencies to turn ideas into edits that feel clear, cinematic, and intentional. From fast-paced social content to long-form stories, I focus on rhythm, structure, and the details that keep people watching.</p>
       <div class="services">
         <div class="service-row"><span>Video Editing</span><span>Narrative & social</span></div>
         <div class="service-row"><span>Motion Graphics</span><span>Titles & animation</span></div>
@@ -114,21 +235,26 @@
 <section id="contact">
   <div class="wrap contact-grid">
     <div class="rv">
-      <div class="eyebrow"><span class="num">05</span> CONTACT</div>
+      <div class="eyebrow"><span class="num">06</span> CONTACT</div>
       <h2>Let's Create<br>Something.</h2>
-      <p class="form-note">This form isn't connected to email yet — reach out directly below, or use it once it's wired up.</p>
-      <form onsubmit="handleForm(event)">
-        <div class="field"><label>Name</label><input type="text" required></div>
-        <div class="field"><label>Email</label><input type="email" required></div>
-        <div class="field"><label>Project Details</label><textarea rows="4" required></textarea></div>
+      <!-- Messages are delivered to beshoy12zaref@gmail.com via FormSubmit (formsubmit.co) -->
+      <form id="contactForm" action="https://formsubmit.co/beshoy12zaref@gmail.com" method="POST" onsubmit="handleForm(event)">
+        <input type="hidden" name="_subject" value="New message from your portfolio website">
+        <input type="hidden" name="_template" value="table">
+        <input type="hidden" name="_captcha" value="false">
+        <input type="text" name="_honey" class="hp-field" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <div class="field"><label for="cf-name">Name</label><input id="cf-name" name="name" type="text" autocomplete="name" required></div>
+        <div class="field"><label for="cf-email">Email</label><input id="cf-email" name="email" type="email" autocomplete="email" required></div>
+        <div class="field"><label for="cf-message">Message</label><textarea id="cf-message" name="message" rows="4" required></textarea></div>
         <button class="cta-btn" type="submit">Send Message</button>
+        <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
       </form>
     </div>
     <div class="contact-side rv">
       <div>
         <div class="email">beshoy12zaref@gmail.com</div>
         <div class="socials">
-          <a href="#">Instagram</a><a href="#">Behance</a><a href="#">LinkedIn</a>
+          <a href="https://www.instagram.com/besho_zareff?utm_source=ig_web_button_share_sheet&amp;stkn=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer" aria-label="Instagram (opens in a new tab)">Instagram</a>
         </div>
       </div>
     </div>
@@ -140,9 +266,10 @@
   <span>© 2026 Beshoy Zaref — Video Editor & Motion Designer</span>
 </footer>
 
-<div class="modal-overlay" id="modalOverlay" role="dialog" aria-modal="true" aria-label="Reel preview">
+<div class="modal-overlay" id="modalOverlay" role="dialog" aria-modal="true" aria-label="Video preview">
   <div class="modal-box">
     <button class="modal-close" aria-label="Close preview">✕</button>
+    <video class="modal-video" id="modalVideo" controls playsinline preload="metadata"></video>
     <p id="modalText"></p>
   </div>
 </div>

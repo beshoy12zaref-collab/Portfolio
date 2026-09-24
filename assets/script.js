@@ -21,17 +21,35 @@ track.innerHTML = reels.map((r,i) => `
   </div>`).join('');
 function scrollCarousel(dir){ track.scrollBy({left: dir*260, behavior:'smooth'}); }
 
-// simple accessible preview modal
+// accessible preview modal — plays a real video when a src is supplied,
+// otherwise shows an intentional "coming soon" state
 let lastFocused = null;
 const overlay = document.getElementById('modalOverlay');
-function openModal(title){
+const modalBox = overlay.querySelector('.modal-box');
+const modalVideo = document.getElementById('modalVideo');
+const modalText = document.getElementById('modalText');
+function openModal(title, opts = {}){
   lastFocused = document.activeElement;
-  document.getElementById('modalText').textContent = `"${title}" — preview not yet available. Upload the real edit to enable playback here.`;
+  modalBox.classList.toggle('landscape', !!opts.landscape);
+  modalBox.classList.toggle('has-video', !!opts.src);
+  if(opts.src){
+    modalVideo.src = opts.src;
+    if(opts.poster) modalVideo.poster = opts.poster; else modalVideo.removeAttribute('poster');
+    modalVideo.setAttribute('aria-label', title);
+    const p = modalVideo.play(); if(p && p.catch) p.catch(()=>{});
+  } else if(opts.landscape){
+    modalText.innerHTML = '<span class="modal-soon">Video coming soon</span>';
+    modalText.appendChild(document.createTextNode(`"${title}" is being prepared — the full edit will play here once it's uploaded.`));
+  } else {
+    modalText.textContent = `"${title}" — preview not yet available. Upload the real edit to enable playback here.`;
+  }
   overlay.classList.add('open');
   overlay.querySelector('.modal-close').focus();
 }
 function closeModal(){
   overlay.classList.remove('open');
+  modalVideo.pause(); modalVideo.removeAttribute('src'); modalVideo.load();
+  modalBox.classList.remove('has-video');
   if(lastFocused) lastFocused.focus();
 }
 track.querySelectorAll('.reel-card').forEach((card,i) => {
@@ -42,21 +60,63 @@ overlay.addEventListener('click', e => { if(e.target === overlay) closeModal(); 
 overlay.querySelector('.modal-close').addEventListener('click', closeModal);
 document.addEventListener('keydown', e => { if(e.key==='Escape' && overlay.classList.contains('open')) closeModal(); });
 
-const aiCards = [
-  {title:'Generative Backplate', desc:'AI-generated environment composited into a live-action plate.', tags:['AI Video','Compositing']},
-  {title:'Prompt-to-Motion', desc:'Fully generative motion sequence built from iterative prompt design.', tags:['AI Video','Prompt Design']},
-  {title:'AI-Assisted Grade', desc:'Style-matched grading pass using AI-assisted color tools.', tags:['Motion','Compositing']},
-  {title:'Synthetic B-Roll', desc:'AI b-roll generated and blended into a documentary edit.', tags:['AI Video','Motion']}
+/* ================================================================
+   EDIT YOUR LANDSCAPE (16:9) VIDEOS HERE
+   src:    video URL or file path (e.g. 'assets/videos/project-1.mp4'). Leave '' → "Video coming soon".
+   poster: poster image URL/path (16:9 recommended, e.g. 'assets/images/project-1.jpg', 1920×1080). Leave '' → branded placeholder.
+   ================================================================ */
+const LONG_FORM = [
+  {title:'Featured Long-Form Project', cat:'Documentary', src:'', poster:''},  // featured (large)
+  {title:'Long-Form Project 02',       cat:'Brand Film',  src:'', poster:''},
+  {title:'Long-Form Project 03',       cat:'YouTube',     src:'', poster:''}
 ];
-document.getElementById('aiRow').innerHTML = aiCards.map((c,i) => `
-  <div class="ai-card${i===0?' featured':''}">
-    <div class="ai-thumb">VIDEO PLACEHOLDER · 16:9</div>
-    <div class="ai-body">
-      <h3>${c.title}</h3>
-      <p>${c.desc}</p>
-      <div class="tags">${c.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+const AI_SKILLS = [
+  {title:'AI Video Generation',     desc:'Prompt-built footage shaped into a finished, story-driven edit.',        tags:['Generative','Prompt Design'], src:'', poster:''},
+  {title:'AI-Assisted Compositing', desc:'Generated elements matched and blended into live-action plates.',        tags:['Compositing','VFX'],          src:'', poster:''},
+  {title:'AI Product Visuals',      desc:'Product shots and environments created and animated with AI tools.',     tags:['Product','Motion'],           src:'', poster:''},
+  {title:'AI Visual Storytelling',  desc:'Generative scenes cut to rhythm and sound for a complete narrative.',     tags:['Storytelling','Editing'],     src:'', poster:''}
+];
+
+const esc = v => String(v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function posterHTML(v, i){
+  const empty = !v.src;
+  return `<button type="button" class="vposter${empty?' is-empty':''}" data-i="${i}" aria-label="${empty?'Video coming soon: ':'Play '}${esc(v.title)}">
+      ${v.poster ? `<img src="${esc(v.poster)}" alt="" loading="lazy">` : `<span class="vmark" aria-hidden="true">${String(i+1).padStart(2,'0')}</span>`}
+      <span class="vplay" aria-hidden="true">▶</span>
+      ${empty ? '<span class="vsoon">Video coming soon</span>' : ''}
+      ${!v.poster ? '<span class="vratio" aria-hidden="true">16:9</span>' : ''}
+    </button>`;
+}
+function bindPosters(root, list){
+  root.querySelectorAll('.vposter').forEach(btn => btn.addEventListener('click', () => {
+    const v = list[+btn.dataset.i];
+    openModal(v.title, {landscape:true, src:v.src, poster:v.poster});
+  }));
+}
+const lfGrid = document.getElementById('longFormGrid');
+lfGrid.innerHTML = LONG_FORM.map((v,i) => `
+  <div class="vcard${i===0?' featured':''}">
+    ${posterHTML(v,i)}
+    <div class="vmeta">
+      <span class="reel-num">${String(i+1).padStart(2,'0')}</span>
+      <span class="reel-title">${esc(v.title)}</span>
+      <span class="reel-cat">${esc(v.cat)}</span>
     </div>
   </div>`).join('');
+bindPosters(lfGrid, LONG_FORM);
+
+const aiGrid = document.getElementById('aiSkillsGrid');
+aiGrid.innerHTML = AI_SKILLS.map((v,i) => `
+  <article class="ai-card rv">
+    ${posterHTML(v,i)}
+    <div class="ai-body">
+      <span class="ai-num">${String(i+1).padStart(2,'0')}</span>
+      <h3>${esc(v.title)}</h3>
+      <p>${esc(v.desc)}</p>
+      ${v.tags && v.tags.length ? `<div class="tags">${v.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>` : ''}
+    </div>
+  </article>`).join('');
+bindPosters(aiGrid, AI_SKILLS);
 
 const burgerBtn = document.getElementById('burgerBtn');
 const mobileMenu = document.getElementById('mobileMenu');
@@ -73,11 +133,39 @@ const io = new IntersectionObserver(entries => {
 }, {threshold:.15});
 document.querySelectorAll('.rv').forEach(el => io.observe(el));
 
-function handleForm(e){
+async function handleForm(e){
   e.preventDefault();
-  const btn = e.target.querySelector('.cta-btn');
-  btn.textContent = "Not connected yet — email me directly";
-  btn.disabled = true;
+  const form = e.target;
+  const btn = form.querySelector('.cta-btn');
+  const status = document.getElementById('formStatus');
+  if(form._honey.value) return; // spam bot
+  status.className = 'form-status'; status.textContent = '';
+  btn.disabled = true; btn.textContent = 'Sending…';
+  try{
+    const res = await fetch('https://formsubmit.co/ajax/beshoy12zaref@gmail.com', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Accept':'application/json'},
+      body: JSON.stringify({
+        name: form.name.value.trim(),
+        email: form.email.value.trim(),
+        message: form.message.value.trim(),
+        _replyto: form.email.value.trim(),
+        _subject: 'New message from your portfolio website',
+        _template: 'table',
+        _captcha: 'false'
+      })
+    });
+    const data = await res.json().catch(()=>({}));
+    if(!res.ok || String(data.success) === 'false') throw new Error(data.message || 'Send failed');
+    form.reset();
+    status.classList.add('ok');
+    status.textContent = 'Thanks — your message has been sent. I’ll get back to you soon.';
+  }catch(err){
+    status.classList.add('err');
+    status.innerHTML = 'Sorry, something went wrong. Please try again or email me at <a href="mailto:beshoy12zaref@gmail.com">beshoy12zaref@gmail.com</a>.';
+  }finally{
+    btn.disabled = false; btn.textContent = 'Send Message';
+  }
 }
 
 (function(){

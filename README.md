@@ -1,7 +1,9 @@
 # Beshoy Zaref — Portfolio
 
 Personal portfolio website for Beshoy Zaref, Video Editor & Motion Designer.
-It is a static site (HTML + CSS + JavaScript) — no build step and no server code.
+It's a static site (HTML, CSS and JavaScript) with no build step.
+
+Sections: Hero · Showreel · Long Form · Reels · AI Skills · About · Contact
 
 ## Project structure
 
@@ -11,45 +13,47 @@ portfolio/
 ├── assets/
 │   ├── images/         ← portrait photo
 │   ├── icons/          ← software icons + INFINITY FRAME logos
-│   ├── style.css       ← all styles and animations
-│   └── script.js       ← reels carousel, AI cards, mobile menu, hero canvas
+│   ├── style.css       ← all styles, animations and responsive rules
+│   └── script.js       ← Long Form, Reels, AI Skills cards, video modal, menu, contact form, hero canvas
 └── README.md
 ```
 
-All paths are relative (for example `assets/images/portrait.jpg`), so the site works
-from any GitHub Pages URL, including `https://USERNAME.github.io/REPO-NAME/`.
+Every path is relative, for example `assets/images/portrait.jpg`. The site works at any GitHub Pages URL, including `https://USERNAME.github.io/REPO-NAME/`.
 
 ## Deploy to GitHub Pages
 
-1. Sign in at https://github.com and click **New** (the green button) to create a repository.
-   - **Repository name:** anything you like, e.g. `portfolio`.
-     (Name it `USERNAME.github.io` if you want the site at `https://USERNAME.github.io/` with no extra path.)
-   - Set it to **Public**, then click **Create repository**.
-2. On the new repository page, click **uploading an existing file**
-   (or **Add file → Upload files**).
-3. Unzip the downloaded ZIP on your computer. Open the `portfolio` folder and drag
-   **everything inside it** — `index.html`, `README.md` and the `assets` folder —
-   into the upload area.
-   `index.html` must end up at the top level of the repository, not inside a `portfolio/` subfolder.
+1. Sign in at https://github.com and click **New** to create a repository.
+   - **Repository name:** anything, e.g. `portfolio`.
+     If you want the site at `https://USERNAME.github.io/` with no extra path, name it `USERNAME.github.io` instead.
+   - Choose **Public**, then click **Create repository**.
+2. On the empty repository page, click **uploading an existing file**. You can also use **Add file → Upload files**.
+3. Unzip the ZIP on your computer and open the `portfolio` folder. Drag **everything inside it** into the upload area: `index.html`, `README.md` and the `assets` folder.
+   `index.html` must sit at the top level of the repository, not inside a `portfolio/` subfolder.
 4. Click **Commit changes**.
-5. Go to **Settings → Pages** (left sidebar).
+5. Open **Settings → Pages** in the left sidebar.
 6. Under **Build and deployment → Source**, choose **Deploy from a branch**.
 7. Under **Branch**, choose **main** and **/ (root)**, then click **Save**.
-8. Wait 1–2 minutes and refresh the Settings → Pages screen. Your link appears at the top:
+8. Wait 1–2 minutes, then refresh the Settings → Pages page. Your live link appears at the top:
    `https://USERNAME.github.io/REPO-NAME/`
 
-## Updating the site
+## Adding your videos
 
-Edit or replace files in the repository (Add file → Upload files, or the pencil icon on a file)
-and commit. GitHub Pages redeploys automatically within a minute or two.
+1. Create a folder `assets/videos/` in the repository and upload your `.mp4` files there. Upload poster images to `assets/images/`.
+2. In `assets/script.js`, fill in `src` and `poster` in the `LONG_FORM` and `AI_SKILLS` lists, for example:
+   `{title:'Brand Film', cat:'Brand Film', src:'assets/videos/brand-film.mp4', poster:'assets/images/brand-film.jpg'}`
+   An item with an empty `src` shows "Video coming soon".
+3. To change reel titles, edit the `reels` list at the top of `assets/script.js`.
 
-- Replace the portrait: upload a new file named `assets/images/portrait.jpg`.
-- Edit reel titles or AI cards: change the `reels` and `aiCards` lists at the top of `assets/script.js`.
-- Change text: edit `index.html`.
+GitHub rejects single files larger than 100 MB, so compress videos first. For long videos, a YouTube or Vimeo embed or an external video host is usually a better fit.
+
+## Contact form
+
+The form sends messages through FormSubmit (formsubmit.co) to beshoy12zaref@gmail.com.
+FormSubmit emails you an activation link the first time the live site sends a message. Click that link once, and messages will arrive after that.
 
 ## Notes
 
-- File names are case-sensitive on GitHub Pages (`Portrait.jpg` ≠ `portrait.jpg`).
-- Fonts load from Google Fonts, so the page needs an internet connection to show the exact typography.
-- The contact form is not connected to an email service yet — it is a visual form only.
+- File names are case-sensitive on GitHub Pages, so `Portrait.jpg` and `portrait.jpg` are different files.
+- Fonts (Anton, Bebas Neue, Inter) load from Google Fonts.
 - To preview locally, double-click `index.html`.
+- After you edit and commit files on GitHub, the site redeploys automatically within a minute or two.
