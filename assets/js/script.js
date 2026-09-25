@@ -225,25 +225,53 @@ mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => 
 
 document.querySelectorAll('.rv').forEach(el => io.observe(el));
 
-/* The Contact form is a normal native HTML POST straight to FormSubmit's activated
-   endpoint (see #contactForm's action= in index.html) — no fetch/AJAX, no
-   preventDefault, no JS-generated success message. FormSubmit itself redirects the
-   browser back to the _next URL (https://beshoyzaref.site/?sent=1#contact) only
-   after it has actually processed the submission, so the success message below is
-   shown only once that confirmed redirect has happened — never before. */
-function initContactRedirectStatus(){
+/* The Contact form submits to Web3Forms (https://api.web3forms.com/submit) via
+   fetch(). The page navigation is prevented, the button is disabled/re-labeled
+   while sending, and the green success message is shown only once the response
+   is confirmed successful (response.ok AND JSON success === true) — never before,
+   and never on a failed/network-error request. */
+let contactSubmitInFlight = false;
+async function handleForm(e){
+  e.preventDefault();
+  if(contactSubmitInFlight) return; // guard against duplicate submissions
+  const form = e.target;
+  const btn = form.querySelector('.cta-btn');
   const status = document.getElementById('formStatus');
-  if(!status) return;
-  const params = new URLSearchParams(window.location.search);
-  if(params.get('sent') !== '1') return;
-  status.className = 'form-status ok';
-  status.textContent = 'Thanks — your message has been sent. I’ll get back to you soon.';
-  params.delete('sent');
-  const qs = params.toString();
-  const newUrl = window.location.pathname + (qs ? '?' + qs : '') + window.location.hash;
-  history.replaceState(null, '', newUrl);
+  if(form.botcheck && form.botcheck.checked) return; // spam bot
+  if(!form.checkValidity()){ form.reportValidity(); return; }
+
+  contactSubmitInFlight = true;
+  status.className = 'form-status'; status.textContent = '';
+  btn.disabled = true; btn.textContent = 'Sending…';
+
+  try{
+    const res = await fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        access_key: 'cb986973-0f2b-4bab-9704-2eef534e7955',
+        subject: 'New message from your portfolio website',
+        from_name: 'Beshoy Zaref Portfolio',
+        name: form.name.value.trim(),
+        email: form.email.value.trim(),
+        message: form.message.value.trim(),
+        replyto: form.email.value.trim()
+      })
+    });
+    const data = await res.json().catch(() => ({}));
+    if(!res.ok || data.success !== true) throw new Error(data.message || 'Send failed');
+    form.reset();
+    status.classList.add('ok');
+    status.textContent = 'Thanks — your message has been sent. I’ll get back to you soon.';
+  }catch(err){
+    status.classList.add('err');
+    status.innerHTML = `Sorry, something went wrong. Please try again or email me at <a href="mailto:${esc(CONTACT_EMAIL)}">${esc(CONTACT_EMAIL)}</a>.`;
+    // Form fields are intentionally left untouched on failure.
+  }finally{
+    btn.disabled = false; btn.textContent = 'Send Message';
+    contactSubmitInFlight = false;
+  }
 }
-initContactRedirectStatus();
 
 /* Lets portfolio-data.js apply a Site Content override for the contact email without
    touching any other approved markup. */
@@ -252,9 +280,9 @@ function setContactEmail(email){
   CONTACT_EMAIL = email;
   const el = document.querySelector('.contact-side .email');
   if(el) el.textContent = email;
-  /* Intentionally does NOT touch #contactForm's action — submissions always go to
-     the activated FormSubmit endpoint hardcoded in index.html, never to a raw email
-     address, regardless of what email is displayed publicly. */
+  /* Intentionally does NOT touch #contactForm's submission target — messages always
+     go through the Web3Forms access key hardcoded in this file, never to a raw
+     email address, regardless of what email is displayed publicly. */
 }
 
 (function(){

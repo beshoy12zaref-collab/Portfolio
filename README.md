@@ -61,7 +61,7 @@ A CSS `@supports not (aspect-ratio: …)` rule is the fallback for the rare brow
 
 ## Contact form
 
-The form sends messages through FormSubmit (formsubmit.co) to beshoy12zaref@gmail.com. The first live submission triggers a one-time activation email from FormSubmit — click it once and messages will arrive normally after that.
+The form sends messages through [Web3Forms](https://web3forms.com) to beshoy12zaref@gmail.com, using the public access key already embedded in `assets/js/script.js` (`handleForm()`). Web3Forms access keys are designed to be public/client-side — this is not a secret. Submission is a `fetch()` AJAX call; the page never reloads or redirects, and the green success message only appears once Web3Forms confirms `success: true`. On failure, the existing form values are preserved and an error message with a `mailto:` fallback is shown instead.
 
 ## Admin dashboard
 
