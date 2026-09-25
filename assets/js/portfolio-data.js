@@ -131,8 +131,10 @@
       });
 
       if (bySection.showreel.length) {
-        const url = bySection.showreel[0].video_url;
-        if (isHttpUrl(url) && typeof setShowreelVideo === 'function') setShowreelVideo(url);
+        const sr = bySection.showreel[0];
+        if (isHttpUrl(sr.video_url) && typeof setShowreelVideo === 'function') setShowreelVideo(sr.video_url);
+        if (typeof setShowreelText === 'function') setShowreelText(sr.title, sr.description);
+        if (isHttpUrl(sr.thumbnail_url) && typeof setShowreelThumbnail === 'function') setShowreelThumbnail(sr.thumbnail_url);
       }
       if (bySection.long_form.length && typeof renderLongForm === 'function') {
         renderLongForm(bySection.long_form.map(window.PortfolioImport.rowToRenderItem));
@@ -150,12 +152,18 @@
 
   /* ---------------------------- live site content ---------------------------- */
 
-  /* `site_content` schema ASSUMPTION (not specified by the client): a simple
-     key-value table — columns `key text primary key, value jsonb, updated_at`.
-     Read code below is defensive/duck-typed: it tolerates `value` being a
-     plain string OR a jsonb object like {text: "..."}, and simply skips any
-     key that isn't present or doesn't parse cleanly. See README.md for how
-     to adapt this if the real table differs. */
+  /* `site_content` schema (confirmed): a single-row-per-group table —
+     columns `id text primary key, content jsonb, updated_at timestamptz`.
+     Convention adopted here (must match admin/admin.js exactly): ONE row,
+     id = 'site', whose `content` JSON object holds every editable field,
+     keyed exactly by the Site Content form's `data-key` attributes
+     (hero_intro, about_heading, about_paragraph, contact_heading,
+     contact_paragraph, email, instagram_url, showreel_heading,
+     longform_heading, longform_description, reels_heading,
+     reels_description, aiskills_heading, aiskills_description).
+     See README.md for the full convention. Read code stays defensive: it
+     tolerates a field value being a plain string OR an object like
+     {text: "..."}, and simply skips anything missing or malformed. */
   function extractText(value) {
     if (value == null) return '';
     if (typeof value === 'string') return value;
@@ -175,19 +183,27 @@
   async function loadSiteContent() {
     if (!window.supabaseClient) return;
     try {
-      const { data, error } = await window.supabaseClient.from('site_content').select('*');
-      if (error || !Array.isArray(data)) return;
+      const { data, error } = await window.supabaseClient
+        .from('site_content')
+        .select('id, content')
+        .eq('id', 'site')
+        .maybeSingle();
+      if (error || !data || typeof data.content !== 'object' || data.content === null) return;
 
       const map = {};
-      data.forEach(function (row) {
-        if (row && typeof row.key === 'string') map[row.key] = extractText(row.value);
+      Object.keys(data.content).forEach(function (key) {
+        map[key] = extractText(data.content[key]);
       });
 
       setText('.hero-line', map.hero_intro);
       setText('#about h2', map.about_heading);
       setText('#about .bio', map.about_paragraph);
       setText('#contact h2', map.contact_heading);
-      setText('#contact .rv p', map.contact_paragraph); // only applies if such a paragraph exists in markup
+      /* No `contact_paragraph` target exists in the current markup that is
+         unambiguous — `#contact .rv p` would also match the live form's
+         status message (`#formStatus`), corrupting it. The field stays
+         editable/stored in the dashboard but is intentionally not applied
+         here until a dedicated element exists. See README.md. */
 
       if (map.email && typeof esc === 'function') {
         setText('.contact-side .email', map.email);

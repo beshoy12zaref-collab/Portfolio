@@ -84,21 +84,35 @@ Only the Supabase **publishable** key (safe for the browser) is used anywhere in
 - **Media** — browse, copy public URLs, and delete files in the `portfolio-media` bucket.
 - **Analytics** — total/unique/today/7-day/30-day views, mobile vs. desktop split, top referrers, and a simple bar chart, all computed from the `page_views` table.
 
-### `site_content` schema assumption
+### `site_content` schema and convention
 
-The client's schema for `site_content` wasn't fully specified. This project assumes a simple key-value shape:
+The real `site_content` table is:
 
 ```sql
 create table site_content (
-  key text primary key,
-  value jsonb,
+  id text primary key,
+  content jsonb,
   updated_at timestamptz
 );
 ```
 
-Both `assets/js/portfolio-data.js` (public site reads) and `admin/admin.js` (admin reads/writes) treat this defensively: they read `value` whether it comes back as a plain string or as a JSON object like `{"text": "..."}`, and they simply skip any key that's missing or doesn't parse — nothing throws or blocks rendering. The keys they look for are: `hero_intro`, `about_heading`, `about_paragraph`, `contact_heading`, `contact_paragraph`, `email`, `instagram_url`, `showreel_heading`, `longform_heading`, `longform_description`, `reels_heading`, `reels_description`, `aiskills_heading`, `aiskills_description`.
+**Convention used throughout this codebase:** a single row, `id = 'site'`, whose `content` column is one JSON object holding every editable field, keyed exactly by the Site Content form's `data-key` attributes:
 
-**If your actual `site_content` table has different columns** (e.g. a fixed row with one column per field instead of key/value pairs), update the `map` construction in the `loadSiteContent()` functions in both `assets/js/portfolio-data.js` and `admin/admin.js` — the rest of each file (which selector each key maps to) does not need to change.
+```json
+{
+  "hero_intro": "…", "about_heading": "…", "about_paragraph": "…",
+  "contact_heading": "…", "contact_paragraph": "…", "email": "…",
+  "instagram_url": "…", "showreel_heading": "…", "longform_heading": "…",
+  "longform_description": "…", "reels_heading": "…", "reels_description": "…",
+  "aiskills_heading": "…", "aiskills_description": "…"
+}
+```
+
+Both `assets/js/portfolio-data.js` (public site read) and `admin/admin.js` (admin read/write) select/upsert this one row by `id = 'site'` and agree on this exact key set. A save merges into the existing `content` object (fields left blank in the form keep their last saved value; nothing is silently dropped) rather than replacing it wholesale. Reads stay defensive — a field value can be a plain string or an object like `{"text": "..."}`, and a missing/malformed field is simply skipped, never thrown.
+
+**Known limitation:** `contact_paragraph` is editable in the dashboard but is intentionally **not** applied to the public site. The current markup has no dedicated element for it — the only paragraph inside `#contact .rv` is the contact form's own live status message (`#formStatus`), and applying `contact_paragraph` there would silently overwrite that status text. Add a dedicated element in `index.html`'s contact section and a matching `setText(...)` call in `portfolio-data.js` if you want this field to render live.
+
+**Changelog (this fix):** corrected two bugs that kept dashboard edits from reaching the public site — (1) `site_content` reads/writes previously assumed a `key`/`value` table shape that doesn't match the real `id`/`content` schema above, so Site Content saves/loads silently did nothing; (2) the Showreel section only ever applied the live row's `video_url` (title, description, thumbnail, visibility and Long Form/Reels/AI Skills add/remove/reorder/edit now all reflect fully on refresh). Also added a consistent thumbnail treatment (cinematic overlay, desktop hover zoom, graceful fallback to the original placeholder on a broken image) across Showreel, Long Form, Reels and AI Skills.
 
 ### Analytics privacy
 

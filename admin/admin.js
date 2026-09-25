@@ -476,24 +476,26 @@
     });
   }
 
-  /* ================= site content ================= */
+  /* ================= site content =================
+     Schema (confirmed): `id text primary key, content jsonb, updated_at`.
+     Convention: ONE row, id = 'site', whose `content` JSON object holds
+     every editable field keyed by this form's `data-key` attributes.
+     `siteContentCache` holds the last-loaded object so a save only ever
+     overwrites the fields present in the form, never silently drops keys
+     the form doesn't carry (e.g. anything set by a future field). */
+  let siteContentCache = {};
+
   async function loadSiteContent() {
     const status = document.getElementById('contentStatus');
     status.textContent = '';
     if (!sb) return;
     try {
-      const { data, error } = await sb.from('site_content').select('*');
-      if (error || !Array.isArray(data)) return;
-      const map = {};
-      data.forEach(row => {
-        if (row && typeof row.key === 'string') {
-          const v = row.value;
-          map[row.key] = typeof v === 'string' ? v : (v && typeof v === 'object' ? (v.text || v.value || '') : '');
-        }
-      });
-      Object.keys(map).forEach(key => {
+      const { data, error } = await sb.from('site_content').select('id, content').eq('id', 'site').maybeSingle();
+      if (error || !data || typeof data.content !== 'object' || data.content === null) return;
+      siteContentCache = Object.assign({}, data.content);
+      Object.keys(siteContentCache).forEach(key => {
         const el = document.getElementById('sc-' + key);
-        if (el && map[key]) el.value = map[key];
+        if (el && siteContentCache[key]) el.value = siteContentCache[key];
       });
     } catch (e) { /* keep fields blank — defensive */ }
   }
@@ -505,21 +507,19 @@
       status.className = 'save-status'; status.textContent = 'Saving…';
       if (!sb) { status.className = 'save-status err'; status.textContent = 'Not connected.'; return; }
       const fields = document.querySelectorAll('#contentForm [data-key]');
-      const writes = [];
+      const content = Object.assign({}, siteContentCache);
       fields.forEach(el => {
         const val = el.value.trim();
-        if (!val) return;
-        writes.push({ key: el.dataset.key, value: val, updated_at: new Date().toISOString() });
+        if (val) content[el.dataset.key] = val;
       });
       try {
-        for (const row of writes) {
-          const { error } = await sb.from('site_content').upsert(row, { onConflict: 'key' });
-          if (error) throw error;
-        }
+        const { error } = await sb.from('site_content').upsert({ id: 'site', content, updated_at: new Date().toISOString() }, { onConflict: 'id' });
+        if (error) throw error;
+        siteContentCache = content;
         status.className = 'save-status ok'; status.textContent = 'Saved. The public site will pick this up on next load.';
       } catch (err) {
         status.className = 'save-status err';
-        status.textContent = 'Save failed — check that your site_content table matches the expected key/value shape (see README). ' + (err && err.message ? err.message : '');
+        status.textContent = 'Save failed — check that your site_content table matches the id/content shape (see README). ' + (err && err.message ? err.message : '');
       }
     });
   }
@@ -667,10 +667,9 @@
         const { error: projErr } = await sb.from('projects').insert(rows);
         if (projErr) throw projErr;
 
-        for (const key of Object.keys(DEFAULT_SITE_CONTENT)) {
-          try { await sb.from('site_content').upsert({ key, value: DEFAULT_SITE_CONTENT[key], updated_at: new Date().toISOString() }, { onConflict: 'key' }); }
-          catch (e) { /* site_content shape may differ — best effort, see README */ }
-        }
+        try {
+          await sb.from('site_content').upsert({ id: 'site', content: DEFAULT_SITE_CONTENT, updated_at: new Date().toISOString() }, { onConflict: 'id' });
+        } catch (e) { /* site_content shape may differ — best effort, see README */ }
 
         alert('Import complete. The public site will pick up this content on its next load.');
         await loadProjects();

@@ -67,13 +67,29 @@ const io = new IntersectionObserver(entries => {
   entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('in'); } });
 }, {threshold:.15});
 
+/* Thumbnail fallback: if an uploaded/linked thumbnail 404s or otherwise fails
+   to load, drop back to the exact placeholder markup that was already there
+   (never a broken-image icon). The placeholder element is always rendered
+   in the DOM and simply hidden by CSS (`.has-thumb`) while a thumbnail
+   image is present; on error we remove the image (and its overlay) and
+   drop the `has-thumb` class so CSS reveals the placeholder again. */
+function handleThumbError(img){
+  const card = img.closest('.reel-card') || img.closest('.vposter');
+  if(card) card.classList.remove('has-thumb');
+  const overlay = img.nextElementSibling;
+  if(overlay && overlay.classList && overlay.classList.contains('thumb-overlay')) overlay.remove();
+  img.remove();
+}
+
 const track = document.getElementById('reelTrack');
 function reelCardHTML(r, i){
   const hasThumb = !!r.poster;
   return `
   <div class="reel-item">
-    <div class="reel-card" tabindex="0" role="button" data-i="${i}" aria-label="Preview ${esc(r.title)}">
-      ${hasThumb ? `<img src="${esc(r.poster)}" alt="" loading="lazy">` : `<div class="reel-fill">VIDEO<br>PLACEHOLDER</div>`}
+    <div class="reel-card${hasThumb?' has-thumb':''}" tabindex="0" role="button" data-i="${i}" aria-label="Preview ${esc(r.title)}">
+      <div class="reel-fill">VIDEO<br>PLACEHOLDER</div>
+      ${hasThumb ? `<img src="${esc(r.poster)}" alt="" loading="lazy" onerror="handleThumbError(this)">` : ''}
+      ${hasThumb ? `<div class="thumb-overlay" aria-hidden="true"></div>` : ''}
       <div class="play">▶</div>
     </div>
     <div class="reel-meta">
@@ -148,11 +164,14 @@ document.addEventListener('keydown', e => { if(e.key==='Escape' && overlay.class
 
 function posterHTML(v, i){
   const empty = !v.src;
-  return `<button type="button" class="vposter${empty?' is-empty':''}" data-i="${i}" aria-label="${empty?'Video coming soon: ':'Play '}${esc(v.title)}">
-      ${v.poster ? `<img src="${esc(v.poster)}" alt="" loading="lazy">` : `<span class="vmark" aria-hidden="true">${String(i+1).padStart(2,'0')}</span>`}
+  const hasThumb = !!v.poster;
+  return `<button type="button" class="vposter${empty?' is-empty':''}${hasThumb?' has-thumb':''}" data-i="${i}" aria-label="${empty?'Video coming soon: ':'Play '}${esc(v.title)}">
+      <span class="vmark" aria-hidden="true">${String(i+1).padStart(2,'0')}</span>
+      ${hasThumb ? `<img src="${esc(v.poster)}" alt="" loading="lazy" onerror="handleThumbError(this)">` : ''}
+      ${hasThumb ? `<div class="thumb-overlay" aria-hidden="true"></div>` : ''}
       <span class="vplay" aria-hidden="true">▶</span>
       ${empty ? '<span class="vsoon">Video coming soon</span>' : ''}
-      ${!v.poster ? '<span class="vratio" aria-hidden="true">16:9</span>' : ''}
+      ${!hasThumb ? '<span class="vratio" aria-hidden="true">16:9</span>' : ''}
     </button>`;
 }
 function bindPosters(root, list){
@@ -321,4 +340,47 @@ let SHOWREEL_SRC = 'https://youtu.be/' + DEFAULT_SHOWREEL_YT_ID;
 function setShowreelVideo(url){
   if(!url || typeof url !== 'string') return;
   SHOWREEL_SRC = url;
+}
+
+/* Lets portfolio-data.js apply the live Showreel row's title/description
+   onto the existing `.sr-label` markup without adding or restructuring any
+   DOM — only the text content of the existing <strong> and its trailing
+   text node changes. Missing/blank values leave the current text alone. */
+function setShowreelText(title, description){
+  const label = document.querySelector('#showreelFrame .sr-label');
+  if(!label) return;
+  if(title){
+    const strong = label.querySelector('strong');
+    if(strong) strong.textContent = title;
+  }
+  if(description){
+    const node = label.lastChild;
+    if(node && node.nodeType === Node.TEXT_NODE) node.textContent = description;
+  }
+}
+
+/* Lets portfolio-data.js apply the live Showreel row's thumbnail. The
+   showreel frame has no <img> by default (it's a plain textured frame), so
+   this inserts one — plus the same cinematic overlay used elsewhere — as
+   the frame's first children, behind the existing play button/label
+   (unaffected). On load failure the image and overlay are removed and the
+   frame simply falls back to its original textured background. */
+function setShowreelThumbnail(url){
+  if(!url || typeof url !== 'string') return;
+  const frame = document.getElementById('showreelFrame');
+  if(!frame) return;
+  let img = frame.querySelector(':scope > img');
+  let overlay = frame.querySelector(':scope > .thumb-overlay');
+  if(!img){
+    img = document.createElement('img');
+    img.alt = '';
+    img.loading = 'lazy';
+    img.onerror = function(){ img.remove(); if(overlay) overlay.remove(); };
+    frame.insertBefore(img, frame.firstChild);
+    overlay = document.createElement('div');
+    overlay.className = 'thumb-overlay';
+    overlay.setAttribute('aria-hidden', 'true');
+    frame.insertBefore(overlay, img.nextSibling);
+  }
+  img.src = url;
 }
