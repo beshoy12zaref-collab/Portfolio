@@ -1,7 +1,7 @@
 :root{
   --charcoal:#2B2C2B; --slate:#333F48; --cream:#FFF8EB; --orange:#F36B36;
   --bg:#2B2C2B; --bg2:#242524; --card:#333F48; --line:#454F57;
-  --fg:#FFF8EB; --dim:#A9AFB3; --accent:#F36B36; --accent-dim:#D6572A;
+  --fg:#FFF8EB; --dim:#A9AFB3; --accent:#F36B36; --accent-dim:#D6572A; --success:#6FCF97;
   box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
 }
 *{box-sizing:border-box; margin:0; padding:0;}
@@ -252,7 +252,7 @@ footer{padding:34px 0 calc(34px + env(safe-area-inset-bottom,0px)); border-top:1
 .footer-logo{height:44px; width:auto;}
 .hp-field{position:absolute; left:-9999px; width:1px; height:1px; opacity:0;}
 .form-status{font-size:14px; line-height:1.5; margin-top:16px; min-height:1px; max-width:42ch;}
-.form-status.ok{color:var(--accent); font-weight:600;}
+.form-status.ok{color:var(--success); font-weight:600;}
 .form-status.err{color:#E8A08A;}
 .form-status a{text-decoration:underline;}
 .form-note{color:var(--dim); font-size:12.5px; line-height:1.5; margin:-6px 0 20px; max-width:38ch;}

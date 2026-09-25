@@ -31,6 +31,10 @@ const DEFAULT_AI_SKILLS = [
 ];
 let DEFAULT_SHOWREEL_YT_ID = 'jtzYctPIu3E';
 let CONTACT_EMAIL = 'beshoy12zaref@gmail.com';
+/* Activated FormSubmit endpoint ID — the AJAX submission target. Kept separate from
+   CONTACT_EMAIL (which is only the publicly displayed address / mailto fallback) so
+   Site Content edits to the displayed email never change where the form actually posts. */
+const FORMSUBMIT_ENDPOINT = 'e82971a4bfe5fce4038b7df3fe90c643';
 
 const esc = v => String(v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
@@ -234,7 +238,7 @@ async function handleForm(e){
   status.className = 'form-status'; status.textContent = '';
   btn.disabled = true; btn.textContent = 'Sending…';
   try{
-    const res = await fetch('https://formsubmit.co/ajax/' + CONTACT_EMAIL, {
+    const res = await fetch('https://formsubmit.co/ajax/' + FORMSUBMIT_ENDPOINT, {
       method:'POST',
       headers:{'Content-Type':'application/json','Accept':'application/json'},
       body: JSON.stringify({
@@ -244,6 +248,7 @@ async function handleForm(e){
         _replyto: form.email.value.trim(),
         _subject: 'New message from your portfolio website',
         _template: 'table',
+        _url: 'https://beshoyzaref.site/',
         _captcha: 'false'
       })
     });
@@ -267,8 +272,9 @@ function setContactEmail(email){
   CONTACT_EMAIL = email;
   const el = document.querySelector('.contact-side .email');
   if(el) el.textContent = email;
-  const form = document.getElementById('contactForm');
-  if(form) form.action = 'https://formsubmit.co/' + email;
+  /* Intentionally does NOT touch #contactForm's action/AJAX endpoint — submissions
+     always go to the activated FormSubmit endpoint (FORMSUBMIT_ENDPOINT), never to
+     a raw email address, regardless of what email is displayed publicly. */
 }
 
 (function(){
