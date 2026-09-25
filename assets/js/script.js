@@ -31,10 +31,6 @@ const DEFAULT_AI_SKILLS = [
 ];
 let DEFAULT_SHOWREEL_YT_ID = 'jtzYctPIu3E';
 let CONTACT_EMAIL = 'beshoy12zaref@gmail.com';
-/* Activated FormSubmit endpoint ID — the AJAX submission target. Kept separate from
-   CONTACT_EMAIL (which is only the publicly displayed address / mailto fallback) so
-   Site Content edits to the displayed email never change where the form actually posts. */
-const FORMSUBMIT_ENDPOINT = 'e82971a4bfe5fce4038b7df3fe90c643';
 
 const esc = v => String(v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
@@ -229,41 +225,25 @@ mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => 
 
 document.querySelectorAll('.rv').forEach(el => io.observe(el));
 
-async function handleForm(e){
-  e.preventDefault();
-  const form = e.target;
-  const btn = form.querySelector('.cta-btn');
+/* The Contact form is a normal native HTML POST straight to FormSubmit's activated
+   endpoint (see #contactForm's action= in index.html) — no fetch/AJAX, no
+   preventDefault, no JS-generated success message. FormSubmit itself redirects the
+   browser back to the _next URL (https://beshoyzaref.site/?sent=1#contact) only
+   after it has actually processed the submission, so the success message below is
+   shown only once that confirmed redirect has happened — never before. */
+function initContactRedirectStatus(){
   const status = document.getElementById('formStatus');
-  if(form._honey.value) return; // spam bot
-  status.className = 'form-status'; status.textContent = '';
-  btn.disabled = true; btn.textContent = 'Sending…';
-  try{
-    const res = await fetch('https://formsubmit.co/ajax/' + FORMSUBMIT_ENDPOINT, {
-      method:'POST',
-      headers:{'Content-Type':'application/json','Accept':'application/json'},
-      body: JSON.stringify({
-        name: form.name.value.trim(),
-        email: form.email.value.trim(),
-        message: form.message.value.trim(),
-        _replyto: form.email.value.trim(),
-        _subject: 'New message from your portfolio website',
-        _template: 'table',
-        _url: 'https://beshoyzaref.site/',
-        _captcha: 'false'
-      })
-    });
-    const data = await res.json().catch(()=>({}));
-    if(!res.ok || String(data.success) === 'false') throw new Error(data.message || 'Send failed');
-    form.reset();
-    status.classList.add('ok');
-    status.textContent = 'Thanks — your message has been sent. I’ll get back to you soon.';
-  }catch(err){
-    status.classList.add('err');
-    status.innerHTML = `Sorry, something went wrong. Please try again or email me at <a href="mailto:${esc(CONTACT_EMAIL)}">${esc(CONTACT_EMAIL)}</a>.`;
-  }finally{
-    btn.disabled = false; btn.textContent = 'Send Message';
-  }
+  if(!status) return;
+  const params = new URLSearchParams(window.location.search);
+  if(params.get('sent') !== '1') return;
+  status.className = 'form-status ok';
+  status.textContent = 'Thanks — your message has been sent. I’ll get back to you soon.';
+  params.delete('sent');
+  const qs = params.toString();
+  const newUrl = window.location.pathname + (qs ? '?' + qs : '') + window.location.hash;
+  history.replaceState(null, '', newUrl);
 }
+initContactRedirectStatus();
 
 /* Lets portfolio-data.js apply a Site Content override for the contact email without
    touching any other approved markup. */
@@ -272,9 +252,9 @@ function setContactEmail(email){
   CONTACT_EMAIL = email;
   const el = document.querySelector('.contact-side .email');
   if(el) el.textContent = email;
-  /* Intentionally does NOT touch #contactForm's action/AJAX endpoint — submissions
-     always go to the activated FormSubmit endpoint (FORMSUBMIT_ENDPOINT), never to
-     a raw email address, regardless of what email is displayed publicly. */
+  /* Intentionally does NOT touch #contactForm's action — submissions always go to
+     the activated FormSubmit endpoint hardcoded in index.html, never to a raw email
+     address, regardless of what email is displayed publicly. */
 }
 
 (function(){

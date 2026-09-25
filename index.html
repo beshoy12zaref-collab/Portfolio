@@ -237,12 +237,12 @@
     <div class="rv">
       <div class="eyebrow"><span class="num">06</span> CONTACT</div>
       <h2>Let's Create<br>Something.</h2>
-      <!-- Messages are delivered to beshoy12zaref@gmail.com via FormSubmit (formsubmit.co) using an activated endpoint ID, not the raw email address -->
-      <form id="contactForm" action="https://formsubmit.co/e82971a4bfe5fce4038b7df3fe90c643" method="POST" onsubmit="handleForm(event)">
+      <!-- Messages are delivered to beshoy12zaref@gmail.com via a normal native HTML POST to FormSubmit's activated endpoint ID (not the raw email address, not AJAX) -->
+      <form id="contactForm" action="https://formsubmit.co/e82971a4bfe5fce4038b7df3fe90c643" method="POST">
         <input type="hidden" name="_subject" value="New message from your portfolio website">
         <input type="hidden" name="_template" value="table">
-        <input type="hidden" name="_captcha" value="false">
         <input type="hidden" name="_url" value="https://beshoyzaref.site/">
+        <input type="hidden" name="_next" value="https://beshoyzaref.site/?sent=1#contact">
         <input type="text" name="_honey" class="hp-field" tabindex="-1" autocomplete="off" aria-hidden="true">
         <div class="field"><label for="cf-name">Name</label><input id="cf-name" name="name" type="text" autocomplete="name" required></div>
         <div class="field"><label for="cf-email">Email</label><input id="cf-email" name="email" type="email" autocomplete="email" required></div>
