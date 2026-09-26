@@ -182,12 +182,6 @@ nav{position:fixed; top:0; left:0; right:0; z-index:50; padding:16px 24px; displ
 .modal-box.has-yt .modal-close{z-index:2; top:-46px; right:0; background:rgba(20,20,20,.6);}
 .modal-overlay.yt-open{padding-top:64px;}
 @media (max-width:640px){ .modal-overlay.yt-open{padding-top:56px;} }
-/* modal-box: no fixed/min-height floor — pure aspect-ratio, with the same fallback pattern */
-@supports not (aspect-ratio: 9 / 16){
-  .modal-box{box-sizing:content-box; height:0; min-height:0; padding-bottom:177.7778%;}
-  .modal-box.landscape{padding-bottom:56.25%;}
-  .modal-box > *{box-sizing:border-box;}
-}
 
 /* VIDEO CARDS (shared: Long Form + AI Skills) */
 .vcard{min-width:0;}
@@ -365,6 +359,61 @@ footer{padding:34px 0 calc(34px + env(safe-area-inset-bottom,0px)); border-top:1
         calc((100dvh - 88px) * 0.5625)
       );
       max-height: calc(100dvh - 88px);
+    }
+  }
+}
+
+/* Explicit mobile guard: on some older Android browsers, stale padding/visibility
+   from other states can otherwise linger and shrink or hide the modal content. */
+@media (max-width: 640px) {
+  .modal-overlay.yt-open .modal-box {
+    padding: 0;
+  }
+
+  .modal-overlay.yt-open .modal-yt,
+  .modal-overlay.yt-open iframe {
+    visibility: visible;
+    opacity: 1;
+  }
+}
+
+/* Mobile-safe fallback for browsers that do not support `aspect-ratio` at all (e.g.
+   older Samsung/Android browsers). The previous height:0 + percentage padding-bottom
+   technique depended on the modal-box having a definite width from its flex parent,
+   which it does not reliably get inside a centered flex overlay — so the calculated
+   height (and the YouTube iframe inside it) collapsed to zero, leaving only the
+   border line and close button visible even though audio kept playing. This version
+   sizes the modal directly from the viewport instead, so it never depends on that. */
+@supports not (aspect-ratio: 9 / 16) {
+  @media (max-width: 640px) {
+    .modal-overlay.yt-open {
+      padding: 56px 24px 16px;
+      overflow: hidden;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.yt-open .modal-box:not(.landscape) {
+      box-sizing: border-box;
+      width: calc(100vw - 48px);
+      height: calc(177.7778vw - 85.333px);
+      max-width: 420px;
+      max-height: calc(100vh - 88px);
+      min-height: 300px;
+      padding: 0;
+      margin: auto;
+      overflow: hidden;
+    }
+
+    .modal-overlay.yt-open .modal-yt,
+    .modal-overlay.yt-open .modal-yt iframe {
+      position: absolute;
+      inset: 0;
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-height: 100%;
+      border: 0;
     }
   }
 }
