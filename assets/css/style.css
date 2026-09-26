@@ -88,8 +88,29 @@ nav{position:fixed; top:0; left:0; right:0; z-index:50; padding:16px 24px; displ
     repeating-linear-gradient(90deg, rgba(255,248,235,.06) 0 3px, transparent 3px 26px) bottom/100% 14px no-repeat,
     radial-gradient(120% 100% at 30% 10%, #3a4048 0%, var(--bg2) 70%);}
 .sr-video > img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block;}
-.sr-play{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:74px; height:74px; border-radius:50%; background:var(--accent); color:#2B2C2B; border:none; font-size:20px; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 0 0 0 rgba(243,107,54,.5); animation:pulse 2.6s ease-out infinite;}
+/* UNIFIED PLAY BUTTON — single design source (originally the Showreel button) applied
+   identically to Showreel (.sr-play) and every Long Form / AI Skills card (.vplay,
+   shared via .vposter): same color, size, icon, glow, pulse animation and hover
+   behavior, on static/default content and cards rendered live from Supabase, with or
+   without a thumbnail. Reels intentionally keep their own transparent outline style
+   (see .reel-card .play further down) — not part of this unification. */
+.sr-play, .vposter .vplay{
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  width:74px; height:74px; border-radius:50%;
+  background:var(--accent); color:#2B2C2B; border:none;
+  font-size:20px; display:flex; align-items:center; justify-content:center;
+  cursor:pointer; box-shadow:0 0 0 0 rgba(243,107,54,.5);
+  animation:pulse 2.6s ease-out infinite;
+  transition:transform .25s ease;
+  z-index:2;
+}
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(243,107,54,.4);}70%{box-shadow:0 0 0 22px rgba(243,107,54,0);}100%{box-shadow:0 0 0 0 rgba(243,107,54,0);}}
+@media (hover:hover) and (pointer:fine){
+  .sr-video:hover .sr-play,
+  .vposter:hover .vplay{
+    transform:translate(-50%,-50%) scale(1.08);
+  }
+}
 .sr-label{position:absolute; bottom:22px; left:24px; color:var(--dim); font-size:12px; letter-spacing:.05em; text-align:left;}
 .sr-label strong{display:block; color:var(--fg); font-size:13px; font-weight:600; margin-bottom:2px;}
 @media (max-width:640px){ #showreel{padding-top:34px;} .sr-label{left:16px; bottom:16px;} }
@@ -121,7 +142,14 @@ nav{position:fixed; top:0; left:0; right:0; z-index:50; padding:16px 24px; displ
     repeating-linear-gradient(0deg, rgba(255,248,235,.05) 0 3px, transparent 3px 22px) right/10px 100% no-repeat,
     radial-gradient(140% 90% at 50% 15%, #3a4048 0%, var(--bg2) 100%);}
 .reel-card > img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover;}
-.play{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:40px; height:40px; border-radius:50%; border:1px solid rgba(255,248,235,.5); display:flex; align-items:center; justify-content:center; font-size:13px; background:rgba(43,44,43,.35);}
+/* Reels intentionally keep their own transparent, thin-outline play button — not the
+   unified orange design above — with a lightweight hover/focus animation of its own
+   (subtle scale + brighter outline), suited to the vertical 9:16 card. */
+.play{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:40px; height:40px; border-radius:50%; border:1px solid rgba(255,248,235,.5); display:flex; align-items:center; justify-content:center; font-size:13px; background:rgba(43,44,43,.35); transition:transform .25s ease, border-color .25s ease, background-color .25s ease;}
+@media (hover:hover) and (pointer:fine){
+  .reel-card:hover .play{transform:translate(-50%,-50%) scale(1.1); border-color:rgba(255,248,235,.85); background:rgba(43,44,43,.5);}
+}
+.reel-card:focus-visible .play{transform:translate(-50%,-50%) scale(1.1); border-color:rgba(255,248,235,.85);}
 .reel-meta{padding:12px 2px 0; display:flex; justify-content:space-between; align-items:baseline; gap:10px;}
 .reel-num{font-family:'Bebas Neue'; color:var(--accent); font-size:14px;}
 .reel-title{font-size:14.5px; font-weight:600;}
@@ -171,9 +199,6 @@ nav{position:fixed; top:0; left:0; right:0; z-index:50; padding:16px 24px; displ
 .vposter:focus-visible{outline:2px solid var(--accent); outline-offset:3px;}
 .vposter img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover;}
 .vposter .vmark{position:absolute; top:18px; left:18px; font-family:'Bebas Neue'; font-size:clamp(34px,6vw,64px); line-height:.85; color:rgba(255,248,235,.08); pointer-events:none;}
-.vposter .vplay{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:clamp(46px,7vw,64px); height:clamp(46px,7vw,64px); border-radius:50%; background:var(--accent); color:#2B2C2B; display:flex; align-items:center; justify-content:center; font-size:clamp(14px,1.8vw,18px); box-shadow:0 10px 26px -8px rgba(0,0,0,.6); transition:transform .25s;}
-.vposter:hover .vplay{transform:translate(-50%,-50%) scale(1.08);}
-.vposter.is-empty .vplay{background:rgba(43,44,43,.55); color:var(--fg); border:1px solid rgba(255,248,235,.45); box-shadow:none;}
 .vposter .vsoon{position:absolute; top:12px; right:12px; font-size:10.5px; letter-spacing:.1em; font-weight:600; text-transform:uppercase; color:var(--accent); background:rgba(43,44,43,.75); border:1px solid rgba(243,107,54,.45); border-radius:20px; padding:4px 10px;}
 .vposter .vratio{position:absolute; bottom:12px; right:14px; font-size:10.5px; letter-spacing:.08em; color:var(--dim);}
 .vmeta{padding:12px 2px 0; display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;}
@@ -294,4 +319,52 @@ footer{padding:34px 0 calc(34px + env(safe-area-inset-bottom,0px)); border-top:1
     box-sizing:content-box; height:0; min-height:0; max-height:none; padding-bottom:177.7778%;
   }
   .reel-card > *{box-sizing:border-box;}
+}
+
+/* Mobile fix: constrain the 9:16 Reels video modal to the visible viewport height.
+   Without this, a shrunken Android browser toolbar can push the aspect-ratio-sized
+   modal (and its YouTube iframe) outside the visible area, leaving only a border
+   line and the close button on screen. */
+@media (max-width: 640px) {
+  .modal-overlay.yt-open {
+    box-sizing: border-box;
+    padding: 56px 12px 16px;
+    overflow-y: auto;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-overlay.yt-open .modal-box:not(.landscape) {
+    width: min(
+      calc(100vw - 24px),
+      calc((100vh - 88px) * 0.5625)
+    );
+    max-width: 420px;
+    max-height: calc(100vh - 88px);
+    aspect-ratio: 9 / 16;
+    flex: 0 0 auto;
+    margin: auto;
+  }
+
+  .modal-overlay.yt-open .modal-yt,
+  .modal-overlay.yt-open .modal-yt iframe {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+}
+
+@supports (height: 100dvh) {
+  @media (max-width: 640px) {
+    .modal-overlay.yt-open .modal-box:not(.landscape) {
+      width: min(
+        calc(100vw - 24px),
+        calc((100dvh - 88px) * 0.5625)
+      );
+      max-height: calc(100dvh - 88px);
+    }
+  }
 }
