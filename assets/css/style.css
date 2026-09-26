@@ -417,3 +417,30 @@ footer{padding:34px 0 calc(34px + env(safe-area-inset-bottom,0px)); border-top:1
     }
   }
 }
+
+/* JS-measured mobile video box. Kept last so it wins over legacy modal rules. */
+@media (max-width: 640px) {
+  .modal-box.mobile-video-fit {
+    box-sizing: border-box;
+  }
+
+  .modal-box.mobile-video-fit .modal-close {
+    top: 8px;
+    right: 8px;
+    z-index: 4;
+    background: rgba(20,20,20,.72);
+  }
+
+  .modal-box.mobile-video-fit .modal-yt,
+  .modal-box.mobile-video-fit .modal-yt iframe,
+  .modal-box.mobile-video-fit .modal-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    min-width: 100%;
+    min-height: 100%;
+    visibility: visible;
+    opacity: 1;
+  }
+}

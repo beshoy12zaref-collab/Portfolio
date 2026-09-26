@@ -121,6 +121,57 @@ const modalBox = overlay.querySelector('.modal-box');
 const modalVideo = document.getElementById('modalVideo');
 const modalText = document.getElementById('modalText');
 const modalYT = document.getElementById('modalYT');
+
+/* Some Android/Samsung browsers report a layout viewport that is taller than the
+   actually visible area while their address/translation bars are open. Relying on
+   flex centring + CSS aspect-ratio can therefore place a portrait iframe below the
+   visible screen (audio still plays, but only the modal border is visible).
+   Measure the visual viewport directly and give the modal a definite pixel box. */
+function fitMobileVideoModal(){
+  const isMobile = window.matchMedia && window.matchMedia('(max-width: 640px)').matches;
+  const isPlayable = modalBox.classList.contains('has-yt') || modalBox.classList.contains('has-video');
+  if(!isMobile || !overlay.classList.contains('open') || !isPlayable){
+    modalBox.classList.remove('mobile-video-fit');
+    ['width','height','max-width','max-height','aspect-ratio','position','left','top','margin','padding','overflow']
+      .forEach(name => modalBox.style.removeProperty(name));
+    return;
+  }
+
+  const vv = window.visualViewport;
+  const viewportWidth = Math.max(240, vv ? vv.width : window.innerWidth);
+  const viewportHeight = Math.max(320, vv ? vv.height : window.innerHeight);
+  const offsetLeft = vv ? vv.offsetLeft : 0;
+  const offsetTop = vv ? vv.offsetTop : 0;
+  const landscape = modalBox.classList.contains('landscape');
+  const ratio = landscape ? 16 / 9 : 9 / 16;
+  const sideGap = 24;
+  const verticalGap = 88;
+  const widthLimit = Math.max(200, viewportWidth - sideGap);
+  const heightLimit = Math.max(260, viewportHeight - verticalGap);
+  const designLimit = landscape ? 960 : 420;
+  const width = Math.min(widthLimit, heightLimit * ratio, designLimit);
+  const height = width / ratio;
+
+  modalBox.classList.add('mobile-video-fit');
+  modalBox.style.setProperty('width', width + 'px', 'important');
+  modalBox.style.setProperty('height', height + 'px', 'important');
+  modalBox.style.setProperty('max-width', 'none', 'important');
+  modalBox.style.setProperty('max-height', 'none', 'important');
+  modalBox.style.setProperty('aspect-ratio', 'auto', 'important');
+  modalBox.style.setProperty('position', 'fixed', 'important');
+  modalBox.style.setProperty('left', (offsetLeft + (viewportWidth - width) / 2) + 'px', 'important');
+  modalBox.style.setProperty('top', (offsetTop + (viewportHeight - height) / 2) + 'px', 'important');
+  modalBox.style.setProperty('margin', '0', 'important');
+  modalBox.style.setProperty('padding', '0', 'important');
+  modalBox.style.setProperty('overflow', 'hidden', 'important');
+}
+
+function clearMobileVideoFit(){
+  modalBox.classList.remove('mobile-video-fit');
+  ['width','height','max-width','max-height','aspect-ratio','position','left','top','margin','padding','overflow']
+    .forEach(name => modalBox.style.removeProperty(name));
+}
+
 function openModal(title, opts = {}){
   lastFocused = document.activeElement;
   modalBox.classList.toggle('landscape', !!opts.landscape);
@@ -149,6 +200,8 @@ function openModal(title, opts = {}){
     modalText.textContent = `"${title}" — preview not yet available. Upload the real edit to enable playback here.`;
   }
   overlay.classList.add('open');
+  fitMobileVideoModal();
+  requestAnimationFrame(fitMobileVideoModal);
   overlay.querySelector('.modal-close').focus();
 }
 function closeModal(){
@@ -156,11 +209,18 @@ function closeModal(){
   modalVideo.pause(); modalVideo.removeAttribute('src'); modalVideo.load();
   modalBox.classList.remove('has-yt'); overlay.classList.remove('yt-open'); modalYT.innerHTML = '';
   modalBox.classList.remove('has-video');
+  clearMobileVideoFit();
   if(lastFocused) lastFocused.focus();
 }
 overlay.addEventListener('click', e => { if(e.target === overlay) closeModal(); });
 overlay.querySelector('.modal-close').addEventListener('click', closeModal);
 document.addEventListener('keydown', e => { if(e.key==='Escape' && overlay.classList.contains('open')) closeModal(); });
+window.addEventListener('resize', fitMobileVideoModal);
+window.addEventListener('orientationchange', () => setTimeout(fitMobileVideoModal, 120));
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize', fitMobileVideoModal);
+  window.visualViewport.addEventListener('scroll', fitMobileVideoModal);
+}
 
 function posterHTML(v, i){
   const empty = !v.src;
