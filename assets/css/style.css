@@ -25,8 +25,7 @@ section{padding:110px 0;}
 @media (max-width:640px){ section{padding:70px 0;} .wrap{padding:0 20px;} }
 
 /* NAV */
-nav{position:fixed; top:0; left:0; right:0; z-index:50; padding:16px 24px; display:flex; justify-content:space-between; align-items:center; padding-top:calc(16px + env(safe-area-inset-top,0px)); background:linear-gradient(to bottom, rgba(43,44,43,.85), transparent);}
-.nav-logo{height:34px; width:auto;}
+nav{position:fixed; top:0; left:0; right:0; z-index:50; padding:16px 24px; display:flex; justify-content:flex-end; align-items:center; padding-top:calc(16px + env(safe-area-inset-top,0px)); background:linear-gradient(to bottom, rgba(43,44,43,.85), transparent);}
 .navlinks{display:flex; gap:28px; font-size:14px; color:var(--fg);}
 .navlinks a{opacity:.85; transition:opacity .2s;}
 .navlinks a:hover{opacity:1;}
@@ -416,6 +415,70 @@ footer{padding:34px 0 calc(34px + env(safe-area-inset-bottom,0px)); border-top:1
       border: 0;
     }
   }
+}
+
+/* ================================================================
+   INTERACTIVE GRID BACKGROUND — Showreel/Long Form/Reels (continuous) + Contact
+   Purely decorative square-grid background drawn by assets/js/interactive-grid.js
+   on <canvas> elements placed behind the content. Applies only to
+   `.interactive-grid-section` (added in index.html): the #gridSurface wrapper
+   that spans Showreel + Long Form + Reels as ONE continuous grid surface, and
+   the separate #contact section — never the Hero (which keeps its own
+   #pixelCanvas), AI Skills, About, the modal, nav, or the admin dashboard.
+
+   Showreel/Long Form/Reels intentionally share a single wrapper (#gridSurface)
+   and a single canvas sized to that wrapper's full height, so the grid lines
+   and seeded orange cells are drawn once across all three sections with no
+   per-section restart — this is what removes the seam at each section
+   boundary. #contact stays spatially separate (other panels sit between it
+   and Reels) but uses the same cell size/seeding/opacity values.
+
+   Stacking: `isolation:isolate` opens a fresh stacking context; the canvas
+   sits at z-index:-1 inside that context (behind the auto-stacked content)
+   and `.wrap` is lifted to z-index:1 to make that explicit. The canvas itself
+   is `position:absolute; inset:0` so it never changes layout size, and
+   `pointer-events:none` so it can never intercept clicks/taps/scroll — every
+   button, link, card and the Reels carousel underneath remain fully
+   interactive.
+
+   A CSS-only static grid (faint lines + a handful of fixed faint orange
+   squares, same subtlety as the canvas version) is the base layer for when
+   canvas is unavailable or JS fails; assets/js/interactive-grid.js adds
+   `.grid-js-ready` once it successfully starts drawing, which hides this
+   fallback so the two never show at once. */
+.interactive-grid-section{
+  position:relative;
+  isolation:isolate;
+  background-repeat:repeat, repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
+  background-image:
+    repeating-linear-gradient(to right, rgba(69,79,87,.08) 0 1px, transparent 1px 37px),
+    repeating-linear-gradient(to bottom, rgba(69,79,87,.08) 0 1px, transparent 1px 37px),
+    linear-gradient(rgba(243,107,54,.05), rgba(243,107,54,.05)),
+    linear-gradient(rgba(243,107,54,.04), rgba(243,107,54,.04)),
+    linear-gradient(rgba(243,107,54,.06), rgba(243,107,54,.06)),
+    linear-gradient(rgba(243,107,54,.03), rgba(243,107,54,.03)),
+    linear-gradient(rgba(243,107,54,.04), rgba(243,107,54,.04));
+  background-size:37px 37px, 37px 37px, 37px 37px, 37px 37px, 37px 37px, 37px 37px, 37px 37px;
+  background-position:
+    0 0, 0 0,
+    118px 74px, 340px 222px, 559px 37px, 812px 296px, 970px 148px;
+}
+.interactive-grid-section.grid-js-ready{ background-image:none; }
+.interactive-grid-section .wrap{ position:relative; z-index:1; }
+.interactive-grid-canvas{
+  position:absolute; inset:0; width:100%; height:100%;
+  z-index:-1; pointer-events:none; display:block;
+}
+@media (max-width:640px){
+  .interactive-grid-section{
+    background-size:29px 29px, 29px 29px, 29px 29px, 29px 29px, 29px 29px, 29px 29px, 29px 29px;
+    background-position:
+      0 0, 0 0,
+      58px 116px, 203px 29px, 319px 174px, 87px 261px, 261px 58px;
+  }
+}
+@media (prefers-reduced-motion: reduce){
+  .interactive-grid-canvas{ transition:none; }
 }
 
 /* JS-measured mobile video box. Kept last so it wins over legacy modal rules. */
